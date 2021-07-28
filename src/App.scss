@@ -1,0 +1,26 @@
+@import url("https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/fira-sans.min.css");
+@import url("https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/fira-code.min.css");
+$body-bg: #D5EBE7;
+$primary: #1F2D4C;
+$secondary: #417C95;
+$font-family-sans-serif: 'Fira Sans';
+$font-family-monospace: 'Fira Code';
+
+@import 'node_modules/bootstrap/scss/bootstrap';
+
+.nav-link.active {
+    color: black !important;
+    font-weight: bold;
+}
+
+.customNavLink:first-child {
+    padding: 5px 5px 5px 0;
+}
+
+.customNavLink:last-child {
+    padding: 5px 0 5px 5px;
+}
+
+.insightCard {
+    margin-bottom: 20px;
+}
