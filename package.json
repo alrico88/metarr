@@ -8,6 +8,7 @@
   "repository": {
     "url": "https://github.com/alrico88/metarr"
   },
+  "private": true,
   "scripts": {
     "dev": "vite",
     "build": "vite build",
