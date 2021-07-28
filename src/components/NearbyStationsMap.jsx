@@ -3,7 +3,18 @@ import PropTypes from 'prop-types';
 import {
   MapContainer, Marker, TileLayer, Tooltip, useMap,
 } from 'react-leaflet';
-import { Icon } from 'leaflet/dist/leaflet-src.esm';
+import L, { Icon } from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const mapConfig = {
   style: {

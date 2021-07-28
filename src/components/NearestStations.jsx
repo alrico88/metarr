@@ -79,7 +79,7 @@ function NearestStations({ onGetInfo }) {
           nearbyStations={nearbyStations}
         />
       </Col>
-      <Col xs={4}>
+      <Col lg={4}>
         <NearbyStationsMap
           onGetInfo={onGetInfo}
           nearbyStations={nearbyStations}
