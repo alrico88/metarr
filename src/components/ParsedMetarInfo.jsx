@@ -22,8 +22,8 @@ function ParsedMetarInfo({ metar, runways }) {
   }, [metar, showMetar]);
 
   useEffect(() => {
-    // eslint-disable-next-line no-unused-vars
-    const msnry = new Masonry('.masonryGrid', { percentPosition: true });
+    // eslint-disable-next-line no-new
+    new Masonry('.masonryGrid', { percentPosition: true });
   });
 
   return (

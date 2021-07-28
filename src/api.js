@@ -1,5 +1,5 @@
 import axios from 'axios';
-import cacheGetter from './cache';
+import cacheGetter from './cacheGetter';
 
 const apiConfig = {
   headers: {

@@ -8,6 +8,7 @@ import 'leaflet/dist/leaflet.css';
 
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import getBounds from '../getBounds';
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -45,37 +46,7 @@ function NearbyStationsMap({ nearbyStations, userPosition, onGetInfo }) {
 
   const bounds = useMemo(() => {
     if (nearbyStations.length > 0) {
-      const {
-        minLon, minLat, maxLon, maxLat,
-      } = nearbyStations.reduce((agg, item) => {
-        const { latitude, longitude } = item.station;
-
-        if (latitude < agg.minLat || !agg.minLat) {
-          // eslint-disable-next-line no-param-reassign
-          agg.minLat = latitude;
-        }
-
-        if (latitude > agg.maxLat || !agg.maxLat) {
-          // eslint-disable-next-line no-param-reassign
-          agg.maxLat = latitude;
-        }
-
-        if (longitude < agg.minLon || !agg.minLon) {
-          // eslint-disable-next-line no-param-reassign
-          agg.minLon = longitude;
-        }
-
-        if (longitude > agg.maxLon || !agg.maxLon) {
-          // eslint-disable-next-line no-param-reassign
-          agg.maxLon = longitude;
-        }
-
-        return agg;
-      }, {
-        minLat: null, minLon: null, maxLat: null, maxLon: null,
-      });
-
-      return [[minLat, minLon], [maxLat, maxLon]];
+      return getBounds(nearbyStations);
     }
 
     return [[-180, -180], [180, 180]];
