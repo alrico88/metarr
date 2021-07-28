@@ -9,6 +9,7 @@ import { getAirportData } from './api';
 import Search from './components/Search';
 import NearestStations from './components/NearestStations';
 import AirportInfo from './components/AirportInfo';
+import Credits from './components/Credits';
 
 function App() {
   const [icao, setIcao] = useState('');
@@ -58,47 +59,54 @@ function App() {
   }
 
   return (
-    <Container>
-      <Row className="py-2">
-        <Col>
-          <h1 className="mb-0">
-            <img
-              src="/logo.svg"
-              className="me-1"
-              alt="metarr logo"
-              style={{ maxHeight: '30px' }}
-            />
-            metarr
-          </h1>
-        </Col>
-      </Row>
-      <Search
-        changeIcao={setIcao}
-        icao={icao}
-        onSearch={getMetar}
-        onGetNearest={handleModalShow}
-      />
-      <AirportInfo
-        icao={airportInfo.ICAO}
-        elevation={airportInfo.elevation}
-        name={airportInfo.name}
-        metar={get(airportInfo, 'weather.METAR')}
-        runways={airportInfo.runwayCount}
-        runwaysList={airportInfo.runways}
-        loading={loading}
-        show={hasInit}
-      />
-      <Modal show={showNearest} size="xl">
-        <Modal.Header closeButton onHide={handleModalClose}>
-          <Modal.Title>Nearest stations</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {
-            showNearest && <NearestStations onGetInfo={forceSearch} />
-          }
-        </Modal.Body>
-      </Modal>
-    </Container>
+    <>
+      <main className="flex-shrink-0">
+        <Container>
+          <Row className="py-2">
+            <Col>
+              <h1 className="mb-0">
+                <img
+                  src="/logo.svg"
+                  className="me-1"
+                  alt="metarr logo"
+                  style={{ maxHeight: '30px' }}
+                />
+                metarr
+              </h1>
+            </Col>
+          </Row>
+          <Search
+            changeIcao={setIcao}
+            icao={icao}
+            onSearch={getMetar}
+            onGetNearest={handleModalShow}
+          />
+          <AirportInfo
+            icao={airportInfo.ICAO}
+            elevation={airportInfo.elevation}
+            name={airportInfo.name}
+            metar={get(airportInfo, 'weather.METAR')}
+            runways={airportInfo.runwayCount}
+            runwaysList={airportInfo.runways}
+            loading={loading}
+            show={hasInit}
+          />
+          <Modal show={showNearest} size="xl">
+            <Modal.Header closeButton onHide={handleModalClose}>
+              <Modal.Title>Nearest stations</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {
+                showNearest && <NearestStations onGetInfo={forceSearch} />
+              }
+            </Modal.Body>
+          </Modal>
+        </Container>
+      </main>
+      <footer className="mt-auto text-center bg-white py-3">
+        <Credits />
+      </footer>
+    </>
   );
 }
 
