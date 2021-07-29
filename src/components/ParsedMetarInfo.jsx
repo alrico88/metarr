@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { Row } from 'react-bootstrap';
 import parser from 'metar-parser';
-import Masonry from 'masonry-layout';
+import Masonry from 'react-masonry-component';
 import Visibility from './insights/Visibility';
 import Weather from './insights/Weather';
 import Altimeter from './insights/Altimeter';
@@ -21,13 +20,12 @@ function ParsedMetarInfo({ metar, runways }) {
     return {};
   }, [metar, showMetar]);
 
-  useEffect(() => {
-    // eslint-disable-next-line no-new
-    new Masonry('.masonryGrid', { percentPosition: true });
-  });
+  const masonryOptions = {
+    percentPosition: true,
+  };
 
   return (
-    <Row className="masonryGrid">
+    <Masonry className="row" options={masonryOptions}>
       <Conditions
         metar={metar}
         temperature={parsedMetar.temperature}
@@ -39,7 +37,7 @@ function ParsedMetarInfo({ metar, runways }) {
       <Altimeter altimeter={parsedMetar.altimeter} />
       <Visibility visibility={parsedMetar.visibility} cavok={parsedMetar.cavok} />
       <Weather weather={parsedMetar.weather} />
-    </Row>
+    </Masonry>
   );
 }
 

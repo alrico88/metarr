@@ -17,7 +17,7 @@ function Weather({ weather }) {
     : <EmptyState text="No special weather" colspan={3} />;
 
   return (
-    <Col lg={4} md={6} sm={1} className="insightCard">
+    <Col lg={4} md={6} sm={12} className="insightCard">
       <Card>
         <Card.Header>
           <BiCloudRain className="me-2" />

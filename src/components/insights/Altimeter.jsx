@@ -6,7 +6,7 @@ import InfoTableRow from '../InfoTableRow';
 
 function Altimeter({ altimeter }) {
   return (
-    <Col lg={4} md={6} sm={1} className="insightCard">
+    <Col lg={4} md={6} sm={12} className="insightCard">
       <Card>
         <Card.Header>
           <BsClockFill className="me-2" />

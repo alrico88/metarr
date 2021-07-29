@@ -63,7 +63,7 @@ function Conditions({
   }, [temperature, dewpoint]);
 
   return (
-    <Col lg={4} md={6} sm={1} className="insightCard">
+    <Col lg={4} md={6} sm={12} className="insightCard">
       <Card>
         <Card.Header>
           <div className="d-flex align-items-center">
