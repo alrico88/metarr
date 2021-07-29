@@ -69,7 +69,7 @@ function App() {
                   src="/logo.svg"
                   className="me-1"
                   alt="metarr logo"
-                  style={{ maxHeight: '30px' }}
+                  height="30"
                 />
                 metarr
               </h1>

@@ -93,11 +93,11 @@ function NearbyStationsMap({ nearbyStations, userPosition, onGetInfo }) {
 NearbyStationsMap.propTypes = {
   nearbyStations: PropTypes.arrayOf(PropTypes.shape({
     station: PropTypes.shape({
-      icao: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
+      icao: PropTypes.string,
+      name: PropTypes.string,
     }),
-    bearing: PropTypes.number.isRequired,
-    nauticalMiles: PropTypes.number.isRequired,
+    bearing: PropTypes.number,
+    nauticalMiles: PropTypes.number,
   })).isRequired,
   onGetInfo: PropTypes.func.isRequired,
   userPosition: PropTypes.shape({
