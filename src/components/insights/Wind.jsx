@@ -62,7 +62,11 @@ function Wind({ wind, runways }) {
             if (wind.direction !== 'VRB') {
               const runwayWindBearing = bearingToAzimuth(wind.direction - bearing) - 180;
 
-              runwayWind = <FaArrowUp style={{ rotate: `${runwayWindBearing}deg` }} />;
+              const style = {
+                transform: `rotate(${runwayWindBearing}deg)`,
+              };
+
+              runwayWind = <FaArrowUp style={style} />;
             }
 
             return (
