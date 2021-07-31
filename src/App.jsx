@@ -66,7 +66,7 @@ function App() {
             <Col>
               <h1 className="mb-0">
                 <img
-                  src="/logo.svg"
+                  src="/logo.png"
                   className="me-1"
                   alt="metarr logo"
                   height="30"
