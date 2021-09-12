@@ -3,9 +3,7 @@ import './App.scss';
 import {
   Col, Container, Modal, Row,
 } from 'react-bootstrap';
-import get from 'lodash/get';
-import set from 'lodash/set';
-import { getAirportData } from './api';
+import { getAirportData, getMetar } from './api';
 import Search from './components/Search';
 import NearestStations from './components/NearestStations';
 import AirportInfo from './components/AirportInfo';
@@ -15,7 +13,9 @@ function App() {
   const [icao, setIcao] = useState('');
   const [showNearest, setShowNearest] = useState(false);
   const [airportInfo, setAirportInfo] = useState({});
-  const [loading, setLoading] = useState(false);
+  const [metar, setMetar] = useState('');
+  const [loadingInfo, setLoadingInfo] = useState(false);
+  const [loadingMetar, setLoadingMetar] = useState(false);
   const [hasInit, setInit] = useState(false);
 
   /**
@@ -23,31 +23,35 @@ function App() {
    * @param {string} airport
    * @returns {Promise<void>}
    */
-  async function getMetar(airport) {
-    try {
-      setInit(true);
-      setLoading(true);
-      const data = await getAirportData(airport);
+  async function getData(airport) {
+    setInit(true);
+    setLoadingInfo(true);
+    getAirportData(airport)
+      .then((data) => {
+        setAirportInfo(data);
+      }).catch((err) => {
+        console.error(err);
+        setAirportInfo({});
+      }).finally(() => {
+        setLoadingInfo(false);
+      });
 
-      const currMetar = get(data, 'weather.METAR');
-
-      if (currMetar == null) {
-        set(data, 'weather.METAR', '');
-      }
-
-      setAirportInfo(data);
-    } catch (e) {
-      setAirportInfo({});
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+    setLoadingMetar(true);
+    getMetar(airport)
+      .then((metarData) => {
+        setMetar(metarData);
+      }).catch((err) => {
+        console.error(err);
+        setMetar('');
+      }).finally(() => {
+        setLoadingMetar(false);
+      });
   }
 
   function forceSearch(airport) {
     setIcao(airport);
     setShowNearest(false);
-    getMetar(airport);
+    getData(airport);
   }
 
   function handleModalShow() {
@@ -78,17 +82,18 @@ function App() {
           <Search
             changeIcao={setIcao}
             icao={icao}
-            onSearch={getMetar}
+            onSearch={getData}
             onGetNearest={handleModalShow}
           />
           <AirportInfo
             icao={airportInfo.ICAO}
             elevation={airportInfo.elevation}
             name={airportInfo.name}
-            metar={get(airportInfo, 'weather.METAR')}
+            metar={metar}
             runways={airportInfo.runwayCount}
             runwaysList={airportInfo.runways}
-            loading={loading}
+            loadingInfo={loadingInfo}
+            loadingMetar={loadingMetar}
             show={hasInit}
           />
           <Modal show={showNearest} size="xl">

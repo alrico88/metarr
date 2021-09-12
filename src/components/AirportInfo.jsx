@@ -13,7 +13,7 @@ import AirportNotFound from './AirportNotFound';
 import Loader from './Loader';
 
 function AirportInfo({
-  icao, name, elevation, metar, runways, runwaysList, loading, show,
+  icao, name, elevation, metar, runways, runwaysList, loadingInfo, loadingMetar, show,
 }) {
   const niceElevation = useMemo(() => processNumber(elevation, 0), [elevation]);
 
@@ -50,7 +50,7 @@ function AirportInfo({
         <Col md={5} sm={12}>
           <h5 className="fw-bold">Airport info:</h5>
           {
-            loading
+            loadingInfo
               ? <Loader />
               : card
           }
@@ -60,13 +60,13 @@ function AirportInfo({
         <Col>
           <h5 className="fw-bold">METAR:</h5>
           {
-            loading && <Loader />
+            loadingMetar && <Loader />
           }
           {
-            (!loading && metar !== '') && <MetarInfo metar={metar} />
+            (!loadingMetar && metar !== '') && <MetarInfo metar={metar} />
           }
           {
-            (!loading && metar === '') && <NoMetarAvailable />
+            (!loadingMetar && metar === '') && <NoMetarAvailable />
           }
         </Col>
       </Row>
@@ -74,13 +74,13 @@ function AirportInfo({
         <Col>
           <h5 className="fw-bold">Parsed METAR:</h5>
           {
-            loading && <Loader />
+            loadingMetar && <Loader />
           }
           {
-            (!loading && metar !== '') && <ParsedMetarInfo metar={metar} runways={runwaysList} />
+            (!loadingMetar && metar !== '') && <ParsedMetarInfo metar={metar} runways={runwaysList} />
           }
           {
-            (!loading && metar === '') && <NoMetarAvailable />
+            (!loadingMetar && metar === '') && <NoMetarAvailable />
           }
         </Col>
       </Row>
@@ -95,7 +95,8 @@ AirportInfo.propTypes = {
   metar: PropTypes.string,
   runways: PropTypes.number,
   runwaysList: runwaysProp,
-  loading: PropTypes.bool.isRequired,
+  loadingInfo: PropTypes.bool.isRequired,
+  loadingMetar: PropTypes.bool.isRequired,
   show: PropTypes.bool.isRequired,
 };
 

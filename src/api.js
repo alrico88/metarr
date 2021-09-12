@@ -1,4 +1,5 @@
 import axios from 'axios';
+import get from 'lodash/get';
 import cacheGetter from './cacheGetter';
 
 const apiConfig = {
@@ -19,7 +20,7 @@ export function getAirportData(icao) {
     return res.data;
   };
 
-  const cacheKey = `${icao}_metar`;
+  const cacheKey = `${icao}_airportinfo`;
 
   return cacheGetter(cacheKey, call, {
     amount: 15,
@@ -28,10 +29,28 @@ export function getAirportData(icao) {
 }
 
 /**
+ * Gets METAR for an ICAO
+ *
+ * @param {string} icao
+ * @return {Promise<string>}
+ */
+export function getMetar(icao) {
+  const call = async () => {
+    const res = await axios.get(`https://avwx.rest/api/metar/${icao}?options=&airport=true&reporting=true&format=json&onfail=cache`, apiConfig);
+
+    return get(res, 'data.sanitized', '');
+  };
+
+  const cacheKey = `${icao}_metar`;
+
+  return cacheGetter(cacheKey, call);
+}
+
+/**
  * Gets the nearest airport to coordinates
  * @param {number} latitude
  * @param {number} longitude
- * @returns {Promise<NearestAirports[]>}
+ * @returns {Promise<NearestAirport[]>}
  */
 export async function getAirportsNearby(latitude, longitude) {
   const call = async () => {
