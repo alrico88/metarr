@@ -46,7 +46,7 @@ function Search({
           </Col>
           <Col lg={3} md={6} className="my-1">
             <h6>Search nearest:</h6>
-            <Button onClick={onGetNearest} variant="secondary" className="w-100">
+            <Button onClick={onGetNearest} variant="primary" className="w-100">
               <BsFillCursorFill className="me-1" />
               Get 10 nearest stations
             </Button>

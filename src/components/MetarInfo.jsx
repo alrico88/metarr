@@ -10,7 +10,7 @@ function MetarInfo({ metar }) {
   return showMetar && (
   <Row>
     <Col>
-      <Alert variant="info" className="font-monospace mb-0">{metar}</Alert>
+      <Alert variant="primary" className="font-monospace mb-0">{metar}</Alert>
     </Col>
   </Row>
   );

@@ -1,8 +1,9 @@
-$body-bg: #D5EBE7;
+$body-bg: #ebf4f5;
+$body-color: #231f20;
 $primary: #1F2D4C;
-$secondary: #417C95;
-$font-family-sans-serif: 'Fira Sans';
-$font-family-monospace: 'Fira Mono';
+$secondary: #1d383a;
+$font-family-sans-serif: 'Cabin', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+$font-family-monospace: 'Roboto Mono', "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", monospace;
 
 @import 'node_modules/bootstrap/scss/bootstrap';
 

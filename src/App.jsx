@@ -68,7 +68,7 @@ function App() {
         <Container>
           <Row className="py-2">
             <Col>
-              <h1 className="mb-0">
+              <h1 className="mb-0 fw-bolder">
                 <img
                   src="/logo.png"
                   className="me-1"
