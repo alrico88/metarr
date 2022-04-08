@@ -35,7 +35,7 @@ function Search({
             <Form onSubmit={handleSubmit}>
               <Form.Group>
                 <InputGroup>
-                  <Form.Control type="text" onChange={handleInput} value={icao} />
+                  <Form.Control type="text" onChange={handleInput} value={icao} className="bg-white" />
                   <Button type="button" onClick={handleSearch} className="align-middle">
                     <BsSearch className="me-1" />
                     Search
