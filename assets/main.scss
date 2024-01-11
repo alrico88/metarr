@@ -1,0 +1,23 @@
+$font-family-sans-serif: 'Source Sans Pro', sans-serif;
+
+body, html {
+  font-size: 16px;
+}
+
+@import 'node_modules/bootstrap/scss/bootstrap';
+
+.overflow-y {
+  overflow-y: auto;
+}
+
+.text-small {
+  font-size: 0.8rem;
+}
+
+.btn-link {
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
