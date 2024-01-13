@@ -1,35 +1,33 @@
 export default defineNuxtConfig({
+  extends: ["nuxt-umami"],
   app: {
     head: {
-      title: "nuxt3-boilerplate",
+      title: "metarr",
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { name: "theme-color", content: "#212121" },
+        { name: "theme-color", content: "#ebf4f5" },
+        { name: "author", content: "Alberto Rico" },
       ],
-      htmlAttrs: {
-        "data-bs-theme": "light",
-      },
+      link: [{ rel: "icon", type: "image/png", href: "/icon.png" }],
     },
   },
   css: ["@/assets/main.scss"],
   modules: [
     "nuxt-icon",
     "@vueuse/nuxt",
-    [
-      "@pinia/nuxt",
-      {
-        autoImports: ["defineStore", "storeToRefs"],
-      },
-    ],
     "@vite-pwa/nuxt",
+    "nuxt3-leaflet",
+    "@bootstrap-vue-next/nuxt",
+    "@nuxtjs/google-fonts",
+    "@nuxtjs/color-mode",
   ],
   pwa: {
     registerType: "prompt",
     manifest: {
-      name: "nuxt3-boilerplate",
-      description: "CHANGE THIS",
-      theme_color: "white",
+      name: "metarr",
+      description: "Check any airport's METAR",
+      theme_color: "#ebf4f5",
       icons: [
         {
           src: "pwa-192x192.png",
@@ -52,10 +50,25 @@ export default defineNuxtConfig({
     client: {
       installPrompt: true,
     },
-    workbox: {
-      navigateFallback: "/",
-      globPatterns: ["**/*.{js,css,html,png,svg,ico,woff,woff2}"],
-      cleanupOutdatedCaches: true,
+  },
+  colorMode: {
+    dataValue: "bs-theme",
+    storageKey: "nuxt-color-mode",
+  },
+  runtimeConfig: {
+    apiToken: "",
+  },
+  googleFonts: {
+    families: {
+      Cabin: [400, 500, 700],
+    },
+  },
+  appConfig: {
+    umami: {
+      host: "https://stats.alrico.es",
+      id: "028ca508-e57f-4271-ac79-eed27dd31445",
+      ignoreLocalhost: true,
+      version: 2,
     },
   },
 });

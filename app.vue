@@ -1,7 +1,7 @@
 <template lang="pug">
-div
+.h-100
   vite-pwa-manifest
   nuxt-loading-indicator
-  nuxt-layout
-    nuxt-page
+  nuxt-layout.h-100
+    nuxt-page.h-100
 </template>

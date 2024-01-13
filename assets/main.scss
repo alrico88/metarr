@@ -1,10 +1,26 @@
-$font-family-sans-serif: 'Source Sans Pro', sans-serif;
+$font-family-sans-serif: 'Cabin', sans-serif;
+
+$body-color: #231f20;
+$primary: #1f2d4c;
+$secondary: #1d383a;
 
 body, html {
   font-size: 16px;
 }
 
 @import 'node_modules/bootstrap/scss/bootstrap';
+
+html[data-bs-theme="light"] {
+  body {
+    background-color: #ebf4f5;
+  }
+}
+
+html[data-bs-theme="dark"] {
+  body {
+    background-color: #0D1520;
+  }
+}
 
 .overflow-y {
   overflow-y: auto;
@@ -20,4 +36,22 @@ body, html {
   &:hover {
     text-decoration: underline;
   }
+
+  &.active {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+}
+
+html, body, #__nuxt {
+  height: 100%;
+}
+
+.icon {
+  vertical-align: middle; 
+  transform: translateY(-5%);
+}
+
+.cursor-pointer:hover {
+  cursor: pointer;
 }
