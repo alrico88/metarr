@@ -8,6 +8,10 @@ export default defineNuxtConfig({
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         { name: "theme-color", content: "#ebf4f5" },
         { name: "author", content: "Alberto Rico" },
+        {
+          name: "google-site-verification",
+          content: "nc0pKffQdhm679g_eXEQhjK-NzBM8ZbyFQLR9ZMeJtc",
+        },
       ],
       link: [{ rel: "icon", type: "image/png", href: "/icon.png" }],
     },
