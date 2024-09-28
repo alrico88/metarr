@@ -14,6 +14,7 @@
     "@prettier/plugin-pug": "^3.0.0",
     "@rushstack/eslint-patch": "^1.6.1",
     "@types/lodash-es": "^4.17.12",
+    "@types/papaparse": "^5.3.14",
     "@vite-pwa/nuxt": "^0.4.0",
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/eslint-config-typescript": "^12.0.0",
@@ -48,6 +49,8 @@
     "number-helper-functions": "^4.1.1",
     "nuxt-umami": "^2.6.7",
     "nuxt3-leaflet": "^1.0.12",
+    "papaparse": "^5.4.1",
     "zod": "^3.23.8"
-  }
+  },
+  "packageManager": "pnpm@8.10.2+sha1.e0b68270e89c817ff88b7be62466a2128c53af02"
 }

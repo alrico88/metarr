@@ -4,7 +4,55 @@ import { getGeoJSONBBox } from "bbox-helper-functions";
 import is from "@sindresorhus/is";
 import CheapRuler from "cheap-ruler";
 import { orderBy } from "lodash-es";
-import { mapAndFilter } from "array-fm";
+import { filterAndMap, mapAndFilter } from "array-fm";
+import papa from "papaparse";
+
+const storage = useStorage("metar");
+
+const cacheKey = "metarr:all-metars";
+
+export function parseMetarString(metar: string): IMetar {
+  return parser(metar);
+}
+
+interface MetarStoreData {
+  station_id: string;
+  raw_text: string;
+  latitude: number;
+  longitude: number;
+}
+
+async function fetchAndStoreMetarData() {
+  const csv = await $fetch<string>(
+    "https://aviationweather.gov/data/cache/metars.cache.csv"
+  );
+
+  const dataLines = csv.split("\n").slice(5).join("\n");
+
+  const parsed = papa.parse<Record<string, unknown> & MetarStoreData>(
+    dataLines,
+    { header: true, skipEmptyLines: true }
+  );
+
+  const data = parsed.data.map((d) => ({
+    station_id: d.station_id,
+    raw_text: d.raw_text,
+    latitude: Number(d.latitude),
+    longitude: Number(d.longitude),
+  }));
+
+  await storage.setItem(cacheKey, data, {
+    ttl: 5 * 60,
+  });
+
+  return data;
+}
+
+async function getAllMetarData() {
+  const stored = await storage.getItem<MetarStoreData[]>(cacheKey);
+
+  return stored || fetchAndStoreMetarData();
+}
 
 function embedMetarToStations(
   stations: NearestStation[],
@@ -23,42 +71,34 @@ function embedMetarToStations(
 
   return mapAndFilter(
     stations,
-    (d) => {
-      return {
-        ...d,
-        metar: metarIndexer.get(d.icaoId),
-      };
-    },
+    (d) => ({
+      ...d,
+      metar: metarIndexer.get(d.icaoId),
+    }),
     (d) => !is.nullOrUndefined(d.metar)
   ) as NearestStationWithMetar[];
 }
 
 export async function getMetar(icao: string): Promise<IMetar | null> {
-  const data = await $fetch<string>(
-    `https://aviationweather.gov/api/data/metar`,
-    {
-      query: {
-        ids: icao,
-        format: "raw",
-      },
-    }
-  );
+  const data = await getAllMetarData();
 
-  return parser(data);
+  const icaoData = data.find((d) => d.station_id === icao);
+
+  if (!icaoData) {
+    throw new Error(`METAR not found for ${icao}`);
+  }
+
+  return parseMetarString(icaoData.raw_text);
 }
 
 export async function getMetars(icaos: string[]): Promise<string[]> {
-  const data = await $fetch<string>(
-    `https://aviationweather.gov/api/data/metar`,
-    {
-      query: {
-        ids: icaos.join(","),
-        format: "raw",
-      },
-    }
-  );
+  const data = await getAllMetarData();
 
-  return data.split("\n");
+  return filterAndMap(
+    data,
+    (d) => icaos.includes(d.station_id),
+    (d) => d.raw_text
+  );
 }
 
 export async function getNearestStations(
@@ -110,24 +150,32 @@ export async function getNearestStations(
 
   const ruler = new CheapRuler(stationsWithMetar[0].lat, "nauticalmiles");
 
-  const listWithDistanceAndBearing = stationsWithMetar.map((station) => {
-    return {
-      station: {
-        latitude: station.lat,
-        longitude: station.lon,
-        name: station.site,
-        icao: station.icaoId,
-      },
-      nautical_miles: ruler.distance(
-        [longitude, latitude],
-        [station.lon, station.lat]
-      ),
-      metar: station.metar,
-    };
-  });
+  const listWithDistanceAndBearing = stationsWithMetar.map((station) => ({
+    station: {
+      latitude: station.lat,
+      longitude: station.lon,
+      name: station.site,
+      icao: station.icaoId,
+    },
+    nautical_miles: ruler.distance(
+      [longitude, latitude],
+      [station.lon, station.lat]
+    ),
+    metar: station.metar,
+  }));
 
   return orderBy(listWithDistanceAndBearing, "nautical_miles", "asc").slice(
     0,
     amountToCheck
   );
+}
+
+export async function getAvailableIcaos() {
+  const data = await getAllMetarData();
+
+  return filterAndMap(
+    data,
+    (d) => is.nonEmptyStringAndNotWhitespace(d?.station_id),
+    (d) => d.station_id
+  ).sort(Intl.Collator().compare);
 }

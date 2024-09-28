@@ -10,9 +10,27 @@
         .col-12.col-md-9
           b-form(@submit.prevent="goToMetar")
             b-form-group.fw-bold(label="Search airport by ICAO:")
-              b-input-group
-                b-form-input(v-model="icao", placeholder="Ex: KJFK")
-                b-button(type="submit", variant="primary") #[icon(name="bi:search")] Search
+              .position-relative.w
+                b-input-group
+                  b-form-input(
+                    v-model="icao",
+                    ref="inputRef",
+                    placeholder="Ex: KJFK",
+                    @keydown.down.prevent="navigateList('down')",
+                    @keydown.up.prevent="navigateList('up')",
+                    autocomplete="off"
+                  )
+                  b-button(
+                    type="submit",
+                    variant="primary",
+                    :disabled="goToDisabled"
+                  ) #[icon(name="bi:search")] Search
+                autocomplete(
+                  :suggestions="filteredSuggestions",
+                  v-model:suggestion-index="suggestionIndex",
+                  :show="showAutocomplete",
+                  @suggestion-clicked="goToMetar"
+                )
         .col
           b-form-group.fw-bold(label="Search nearest:")
             b-button.w-100(to="/nearest", variant="primary") #[icon(name="gis:gnss-antenna")] Find nearest stations
@@ -23,6 +41,9 @@
 
 <script setup lang="ts">
 import is from "@sindresorhus/is";
+
+const { data: icaos } = useFetch("/api/airport/autocomplete");
+const icaosList = computed(() => icaos.value || ([] as string[]));
 
 const route = useRoute();
 
@@ -42,7 +63,25 @@ watch(
   }
 );
 
+const {
+  suggestionIndex,
+  filteredSuggestions,
+  navigateList,
+  showAutocomplete,
+  inputRef,
+} = useAutocomplete(icao, icaosList);
+
 function goToMetar() {
+  if (suggestionIndex.value !== -1) {
+    icao.value = filteredSuggestions.value[suggestionIndex.value];
+  }
+
   navigateTo(`/metar/${icao.value}`);
+
+  nextTick(() => {
+    showAutocomplete.value = false;
+  });
 }
+
+const goToDisabled = computed(() => is.emptyStringOrWhitespace(icao.value));
 </script>

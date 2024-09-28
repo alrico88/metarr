@@ -26,6 +26,17 @@ export default defineNuxtConfig({
     "@nuxtjs/google-fonts",
     "@nuxtjs/color-mode",
   ],
+  nitro: {
+    storage: {
+      metar: {
+        driver: "redis",
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
+        db: process.env.REDIS_DB,
+        password: process.env.REDIS_PASS,
+      },
+    },
+  },
   pwa: {
     registerType: "prompt",
     manifest: {
