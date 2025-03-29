@@ -128,7 +128,7 @@ export async function getNearestStations(
   const [minLon, minLat, maxLon, maxLat] = getGeoJSONBBox(pointAsBuffer);
 
   const list = await $fetch<NearestStation[]>(
-    `https://aviationweather.gov/api/data/stationinfo`,
+    "https://aviationweather.gov/api/data/stationinfo",
     {
       query: {
         bbox: `${minLat},${minLon},${maxLat},${maxLon}`,

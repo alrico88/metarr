@@ -42,4 +42,8 @@ const props = defineProps<{
 }>();
 
 const { tileUrl, tileAttribution } = useTile();
+
+onMounted(() => {
+  import("leaflet");
+});
 </script>

@@ -1,5 +1,4 @@
 export default defineNuxtConfig({
-  extends: ["nuxt-umami"],
   app: {
     head: {
       title: "metarr",
@@ -16,16 +15,20 @@ export default defineNuxtConfig({
       link: [{ rel: "icon", type: "image/png", href: "/icon.png" }],
     },
   },
+
   css: ["@/assets/main.scss"],
+
   modules: [
-    "nuxt-icon",
+    "@nuxt/icon",
     "@vueuse/nuxt",
     "@vite-pwa/nuxt",
-    "nuxt3-leaflet",
+    "@nuxtjs/leaflet",
     "@bootstrap-vue-next/nuxt",
     "@nuxtjs/google-fonts",
     "@nuxtjs/color-mode",
+    "nuxt-umami",
   ],
+
   nitro: {
     storage: {
       metar: {
@@ -37,6 +40,7 @@ export default defineNuxtConfig({
       },
     },
   },
+
   pwa: {
     registerType: "prompt",
     manifest: {
@@ -66,24 +70,28 @@ export default defineNuxtConfig({
       installPrompt: true,
     },
   },
+
   colorMode: {
     dataValue: "bs-theme",
     storageKey: "nuxt-color-mode",
   },
+
   runtimeConfig: {
     apiToken: "",
+    airApiUrl: "https://airapi.vercel.app",
   },
+
   googleFonts: {
     families: {
       Cabin: [400, 500, 700],
     },
   },
-  appConfig: {
-    umami: {
-      host: "https://stats.alrico.es",
-      id: "028ca508-e57f-4271-ac79-eed27dd31445",
-      ignoreLocalhost: true,
-      version: 2,
-    },
+
+  umami: {
+    host: "https://stats.alrico.es",
+    id: "028ca508-e57f-4271-ac79-eed27dd31445",
+    ignoreLocalhost: true,
   },
+
+  compatibilityDate: "2025-03-29",
 });

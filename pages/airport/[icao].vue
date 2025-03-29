@@ -79,8 +79,6 @@ const isReady = ref(false);
 watch(
   [airportData, isReady],
   ([val]) => {
-    console.log(val);
-
     if (is.nullOrUndefined(val) || !isReady) {
       return;
     }
