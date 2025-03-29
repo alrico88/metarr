@@ -75,6 +75,10 @@ const coordsLoading = ref(true);
 const userPosition = ref<GeolocationPosition | null>(null);
 const userPositionError = ref(false);
 
+onMounted(() => {
+  import("leaflet");
+});
+
 onNuxtReady(() => {
   navigator.geolocation.getCurrentPosition(
     (position) => {

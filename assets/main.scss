@@ -1,14 +1,15 @@
-$font-family-sans-serif: 'Cabin', sans-serif;
+$font-family-sans-serif: "Cabin", sans-serif;
 
 $body-color: #231f20;
 $primary: #1f2d4c;
 $secondary: #1d383a;
 
-body, html {
+body,
+html {
   font-size: 16px;
 }
 
-@import 'node_modules/bootstrap/scss/bootstrap';
+@import "bootstrap/scss/bootstrap";
 
 html[data-bs-theme="light"] {
   body {
@@ -18,7 +19,7 @@ html[data-bs-theme="light"] {
 
 html[data-bs-theme="dark"] {
   body {
-    background-color: #0D1520;
+    background-color: #0d1520;
   }
 }
 
@@ -43,12 +44,14 @@ html[data-bs-theme="dark"] {
   }
 }
 
-html, body, #__nuxt {
+html,
+body,
+#__nuxt {
   height: 100%;
 }
 
 .icon {
-  vertical-align: middle; 
+  vertical-align: middle;
   transform: translateY(-5%);
 }
 
