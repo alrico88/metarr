@@ -21,7 +21,6 @@ FROM dependency-base AS production-base
 # build will also take care of building
 # if necessary
 COPY . .
-RUN pnpm run prisma:generate
 RUN pnpm run build
 
 FROM $NODE_VERSION AS production
