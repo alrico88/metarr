@@ -29,18 +29,6 @@ export default defineNuxtConfig({
     "nuxt-umami",
   ],
 
-  nitro: {
-    storage: {
-      metar: {
-        driver: "redis",
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
-        db: process.env.REDIS_DB,
-        password: process.env.REDIS_PASS,
-      },
-    },
-  },
-
   pwa: {
     registerType: "prompt",
     manifest: {
@@ -78,7 +66,13 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     apiToken: "",
-    airApiUrl: "https://airapi.vercel.app",
+    airApiUrl: "",
+    redis: {
+      host: "",
+      port: "",
+      password: "",
+      db: 0,
+    },
   },
 
   googleFonts: {
