@@ -27,12 +27,10 @@ async function fetchAndStoreMetarData() {
     "https://aviationweather.gov/data/cache/metars.cache.csv"
   );
 
-  const dataLines = csv.split("\n").slice(5).join("\n");
-
-  const parsed = papa.parse<Record<string, unknown> & MetarStoreData>(
-    dataLines,
-    { header: true, skipEmptyLines: true }
-  );
+  const parsed = papa.parse<Record<string, unknown> & MetarStoreData>(csv, {
+    header: true,
+    skipEmptyLines: true,
+  });
 
   const data = parsed.data.map((d) => ({
     station_id: d.station_id,
