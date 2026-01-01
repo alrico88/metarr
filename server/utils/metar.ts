@@ -1,9 +1,9 @@
-import parser from "aewx-metar-parser";
+import { metarParser } from "aewx-metar-parser";
 import buffer from "@turf/buffer";
 import { getGeoJSONBBox } from "bbox-helper-functions";
 import is from "@sindresorhus/is";
 import CheapRuler from "cheap-ruler";
-import { orderBy } from "lodash-es";
+import { orderBy } from "es-toolkit";
 import { filterAndMap, mapAndFilter } from "array-fm";
 import papa from "papaparse";
 
@@ -12,7 +12,7 @@ const storage = useStorage("metar");
 const cacheKey = "metarr:all-metars";
 
 export function parseMetarString(metar: string): IMetar {
-  return parser(metar);
+  return metarParser(metar);
 }
 
 interface MetarStoreData {
@@ -24,7 +24,10 @@ interface MetarStoreData {
 
 async function fetchAndStoreMetarData() {
   const csv = await $fetch<string>(
-    "https://aviationweather.gov/data/cache/metars.cache.csv"
+    "https://aviationweather.gov/data/cache/metars.cache.csv",
+    {
+      responseType: "text",
+    }
   );
 
   const parsed = papa.parse<Record<string, unknown> & MetarStoreData>(csv, {
@@ -54,13 +57,11 @@ async function getAllMetarData() {
 
 function embedMetarToStations(
   stations: NearestStation[],
-  metars: string[]
+  metars: MetarStoreData[]
 ): NearestStationWithMetar[] {
   const metarIndexer = metars.reduce(
     (acc, d) => {
-      const icao = d.split(" ").shift();
-
-      acc.set(icao as string, d);
+      acc.set(d.station_id, d.raw_text);
 
       return acc;
     },
@@ -89,14 +90,10 @@ export async function getMetar(icao: string): Promise<IMetar | null> {
   return parseMetarString(icaoData.raw_text);
 }
 
-export async function getMetars(icaos: string[]): Promise<string[]> {
+export async function getMetars(icaos: string[]): Promise<MetarStoreData[]> {
   const data = await getAllMetarData();
 
-  return filterAndMap(
-    data,
-    (d) => icaos.includes(d.station_id),
-    (d) => d.raw_text
-  );
+  return data.filter((d) => icaos.includes(d.station_id));
 }
 
 export async function getNearestStations(
@@ -123,7 +120,7 @@ export async function getNearestStations(
     }
   );
 
-  const [minLon, minLat, maxLon, maxLat] = getGeoJSONBBox(pointAsBuffer);
+  const [minLon, minLat, maxLon, maxLat] = getGeoJSONBBox(pointAsBuffer!);
 
   const list = await $fetch<NearestStation[]>(
     "https://aviationweather.gov/api/data/stationinfo",
@@ -135,7 +132,7 @@ export async function getNearestStations(
     }
   );
 
-  const metars = await getMetars(list.map((d) => d.icaoId));
+  const metars = await getMetars((list ?? []).map((d) => d.icaoId));
 
   const stationsWithMetar = embedMetarToStations(list, metars);
 
@@ -146,7 +143,7 @@ export async function getNearestStations(
     return getNearestStations(latitude, longitude, amount, bufferToApply + 100);
   }
 
-  const ruler = new CheapRuler(stationsWithMetar[0].lat, "nauticalmiles");
+  const ruler = new CheapRuler(stationsWithMetar[0]?.lat ?? 0, "nauticalmiles");
 
   const listWithDistanceAndBearing = stationsWithMetar.map((station) => ({
     station: {
@@ -162,7 +159,7 @@ export async function getNearestStations(
     metar: station.metar,
   }));
 
-  return orderBy(listWithDistanceAndBearing, "nautical_miles", "asc").slice(
+  return orderBy(listWithDistanceAndBearing, ["nautical_miles"], ["asc"]).slice(
     0,
     amountToCheck
   );

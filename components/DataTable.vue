@@ -32,7 +32,8 @@ b-overlay(:show="busy")
 
 <script setup lang="ts">
 import is from "@sindresorhus/is";
-import { get, orderBy } from "lodash-es";
+import { orderBy } from "es-toolkit";
+import { get } from "es-toolkit/compat";
 import { nanoid } from "nanoid";
 
 export interface FieldDef {
@@ -78,7 +79,7 @@ const classes = computed(() => ({
 watch(
   () => props.fields,
   (val) => {
-    sortColumn.value = val[0].key;
+    sortColumn.value = val[0]!.key;
   }
 );
 
@@ -107,7 +108,11 @@ const itemsWithIds = computed<ItemWithId[]>(() =>
 );
 
 const sortedItems = computed(() =>
-  orderBy(itemsWithIds.value, sortColumn.value, sortOrder.value)
+  orderBy(
+    itemsWithIds.value,
+    [sortColumn.value as keyof ItemWithId],
+    [sortOrder.value]
+  )
 );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

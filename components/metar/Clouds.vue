@@ -7,13 +7,13 @@ b-card(no-body)
       :items="metar.clouds",
       bordered,
       empty-text="No clouds",
-      sort-column="base_feet_agl",
+      sort-column="feet",
       sort-order="desc"
     )
 </template>
 ß
 <script setup lang="ts">
-import { get } from "lodash-es";
+import { get } from "es-toolkit/compat";
 import type { FieldDef } from "../DataTable.vue";
 
 const props = defineProps<{
@@ -46,7 +46,7 @@ const fields: FieldDef[] = [
   },
   {
     label: "Elevation (feet)",
-    key: "base_feet_agl",
+    key: "feet",
     sortable: true,
   },
 ];

@@ -11,9 +11,9 @@ export default defineCachedEventHandler<{
 }>(
   async (event) => {
     const nearestSchema = z.object({
-      latitude: z.number({ coerce: true }).min(-90).max(90),
-      longitude: z.number({ coerce: true }).min(-180).max(180),
-      amount: z.number({ coerce: true }).min(10).max(30),
+      latitude: z.coerce.number().min(-90).max(90),
+      longitude: z.coerce.number().min(-180).max(180),
+      amount: z.coerce.number().min(10).max(30),
     });
 
     const { latitude, longitude, amount } = await getValidatedQuery(

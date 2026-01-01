@@ -125,7 +125,7 @@ const { data: stations, pending: stationsLoading } = useAsyncData(
       return [];
     }
 
-    const ruler = new CheapRuler(st[0].station.latitude);
+    const ruler = new CheapRuler(st[0]?.station.latitude ?? 0);
 
     return st.map((d) => ({
       ...d,

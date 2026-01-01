@@ -12,7 +12,7 @@ b-card(no-body)
 </template>
 ß
 <script setup lang="ts">
-import { get } from "lodash-es";
+import { get } from "es-toolkit/compat";
 import type { FieldDef } from "../DataTable.vue";
 
 const props = defineProps<{

@@ -16,7 +16,7 @@ b-card
       info-table-row(title="Dew point", :value="dewPoint", align-right)
       info-table-row(
         title="Humidity",
-        :value="`${Math.round(props.metar.humidity_percent)}%`",
+        :value="`${Math.round(props.metar.humidity.percent)}%`",
         align-right
       )
 </template>

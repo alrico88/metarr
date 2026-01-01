@@ -24,9 +24,9 @@ export default defineNuxtConfig({
     "@vite-pwa/nuxt",
     "@nuxtjs/leaflet",
     "@bootstrap-vue-next/nuxt",
-    "@nuxtjs/google-fonts",
     "@nuxtjs/color-mode",
     "nuxt-umami",
+    "@nuxt/fonts",
   ],
 
   pwa: {
@@ -75,10 +75,14 @@ export default defineNuxtConfig({
     },
   },
 
-  googleFonts: {
-    families: {
-      Cabin: [400, 500, 700],
-    },
+  fonts: {
+    families: [
+      {
+        name: "Cabin",
+        provider: "google",
+        weights: [400, 500, 700],
+      },
+    ],
   },
 
   umami: {
