@@ -67,12 +67,10 @@ export default defineNuxtConfig({
   runtimeConfig: {
     apiToken: "",
     airApiUrl: "https://airapi.vercel.app/api",
-    redis: {
-      host: "",
-      port: "",
-      password: "",
-      db: 0,
-    },
+    redisHost: "",
+    redisPort: "",
+    redisPassword: "",
+    redisDb: 0,
   },
 
   fonts: {
