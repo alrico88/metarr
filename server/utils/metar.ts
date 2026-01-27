@@ -7,9 +7,9 @@ import { orderBy } from "es-toolkit";
 import { filterAndMap, mapAndFilter } from "array-fm";
 import papa from "papaparse";
 
-const storage = useStorage("metar");
+const storage = useStorage("metarr");
 
-const cacheKey = "metarr:all-metars";
+const cacheKey = "all-metars";
 
 export function parseMetarString(metar: string): IMetar {
   return metarParser(metar);

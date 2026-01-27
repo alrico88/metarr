@@ -6,7 +6,7 @@ export default defineNitroPlugin(() => {
   const config = useRuntimeConfig();
 
   const driver = redisDriver({
-    base: "redis",
+    base: "metarr",
     host: config.redisHost,
     port: Number(config.redisPort),
     password: config.redisPassword,
