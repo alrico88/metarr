@@ -22,14 +22,7 @@
             )
             airport-info-row(title="Runways", :value="data.runwayCount")
         .col.h-100
-          l-map.border.rounded(
-            :center="[data.latitude, data.longitude]",
-            :zoom="10",
-            :style="{ height: '200px' }"
-          )
-            l-tile-layer(:url="tileUrl", :attribution="tileAttribution")
-            l-marker(:lat-lng="[data.latitude, data.longitude]")
-              l-tooltip(:content="data.icao")
+          airport-map(:airport="data", height="200px")
           .text-center
             nuxt-link(:to="`/airport/${data.icao}`") View map
 </template>
@@ -40,10 +33,4 @@ const props = defineProps<{
   error: boolean;
   data: Airport | null;
 }>();
-
-const { tileUrl, tileAttribution } = useTile();
-
-onMounted(() => {
-  import("leaflet");
-});
 </script>

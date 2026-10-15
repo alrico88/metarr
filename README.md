@@ -6,7 +6,7 @@ Uses HTML5 Geolocation API to get nearest METAR stations to your position if des
 
 Shows both raw METAR data and shows small insights of the parsed conditions.
 
-Built using [Nuxt.js](https://nuxt.com/), [Vue 3](https://vuejs.org/) and [Leaflet](https://leafletjs.com/).
+Built using [Nuxt.js](https://nuxt.com/), [Vue 3](https://vuejs.org/) and [vue-maplibre-gl](https://indoorequal.github.io/vue-maplibre-gl/) with [OpenFreeMap](https://openfreemap.org/).
 
 Airport data is sourced from [OurAirports](https://ourairports.com/) consumed through [AirAPI](https://github.com/alrico88/airapi) and comes with no guarantee of accuracy or fitness for use. METAR data is sourced from [aviationweather.gov](https://aviationweather.gov/).
 

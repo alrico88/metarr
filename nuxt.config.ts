@@ -16,13 +16,12 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ["@/assets/main.scss"],
+  css: ["@/assets/main.scss", "maplibre-gl/dist/maplibre-gl.css"],
 
   modules: [
     "@nuxt/icon",
     "@vueuse/nuxt",
     "@vite-pwa/nuxt",
-    "@nuxtjs/leaflet",
     "@bootstrap-vue-next/nuxt",
     "@nuxtjs/color-mode",
     "nuxt-umami",

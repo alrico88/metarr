@@ -14,29 +14,11 @@
       b-alert.mb-0(variant="danger", :model-value="userPositionError") Error getting coords. Did you allow geolocation?
       template(v-if="!loadingSome && userPosition")
         .vstack.gap-3
-          l-map.border.rounded(
-            :center="[userPosition.coords.latitude, userPosition.coords.longitude]",
-            :zoom="4",
-            :style="{ height: '300px' }",
-            ref="mapRef"
+          nearest-stations-map(
+            :position="userPosition.coords",
+            :stations="stations ?? []",
+            @select="goTo"
           )
-            l-marker(
-              :lat-lng="[userPosition.coords.latitude, userPosition.coords.longitude]"
-            )
-              l-icon(
-                icon-url="/crosshair.png",
-                :icon-size="[30, 30]",
-                :icon-anchor="[15, 15]"
-              )
-              l-tooltip(content="Your position")
-            l-tile-layer(:url="tileUrl", :attribution="tileAttribution")
-            l-marker(
-              v-for="item of stations",
-              :key="item.station.icao + item.station.name",
-              :lat-lng="[item.station.latitude, item.station.longitude]",
-              @click="goTo(item)"
-            )
-              l-tooltip(:content="item.station.icao")
           data-table(
             v-if="stations",
             :fields="fields",
@@ -56,7 +38,6 @@
 
 <script setup lang="ts">
 import is from "@sindresorhus/is";
-import { getDatasetBBox } from "bbox-helper-functions";
 import CheapRuler from "cheap-ruler";
 import { processNumber } from "number-helper-functions";
 import type { FieldDef } from "~/components/DataTable.vue";
@@ -67,17 +48,11 @@ useSeoMeta({
   keywords: "metar,near,station,position,geolocation",
 });
 
-const { tileUrl, tileAttribution } = useTile();
-
 const { getAzimuth } = useGeography();
 
 const coordsLoading = ref(true);
 const userPosition = ref<GeolocationPosition | null>(null);
 const userPositionError = ref(false);
-
-onMounted(() => {
-  import("leaflet");
-});
 
 onNuxtReady(() => {
   navigator.geolocation.getCurrentPosition(
@@ -141,32 +116,6 @@ const { data: stations, pending: stationsLoading } = useAsyncData(
     watch: [userPosition, nearestAmount],
   }
 );
-
-const bounds = computed(() => {
-  if (is.nonEmptyArray(stations.value)) {
-    const [minLon, minLat, maxLon, maxLat] = getDatasetBBox(stations.value, {
-      latitudeAccessor: (d: NearestAirport) => d.station.latitude,
-      longitudeAccessor: (d: NearestAirport) => d.station.longitude,
-    });
-
-    return [
-      [minLat, minLon],
-      [maxLat, maxLon],
-    ];
-  } else {
-    return [
-      [-90, -180],
-      [90, 180],
-    ];
-  }
-});
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mapRef = templateRef<any>("mapRef");
-
-watchEffect(() => {
-  mapRef.value?.leafletObject.fitBounds(bounds.value);
-});
 
 const loadingSome = computed(
   () => coordsLoading.value || stationsLoading.value
