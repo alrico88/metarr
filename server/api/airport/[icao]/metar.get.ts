@@ -1,6 +1,6 @@
 import is from "@sindresorhus/is";
 
-const THREE_MINUTES_IN_SECONDS = 180;
+const ONE_MINUTE_IN_SECONDS = 60;
 
 export default defineCachedEventHandler(
   (event) => {
@@ -17,6 +17,6 @@ export default defineCachedEventHandler(
   },
   {
     swr: false,
-    maxAge: THREE_MINUTES_IN_SECONDS,
-  }
+    maxAge: ONE_MINUTE_IN_SECONDS,
+  },
 );

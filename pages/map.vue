@@ -1,9 +1,7 @@
 <template lang="pug">
-.container
-  .row
-    .col
-      h2.fs-5.fw-bold Stations map
-      stations-map(@select="goTo")
+u-container
+  h2.mb-2.text-lg.font-bold Stations map
+  stations-map(@select="goTo")
 </template>
 
 <script setup lang="ts">

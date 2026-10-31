@@ -1,24 +1,10 @@
 <template lang="pug">
-b-card
+u-card
   template(#header)
-    .hstack.gap-2.justify-content-between.align-items-center
+    .flex.items-center.justify-between.gap-2
       div #[icon(name="bi:sun")] Conditions
       simple-chooser(:options="tempUnitsOpts", v-model="tempUnits")
-  table.table.table-borderless.mb-0
-    tbody
-      info-table-row(
-        title="Flight conditions",
-        :value="metar.flight_category",
-        :value-color="flightConditionColor",
-        align-right
-      )
-      info-table-row(title="Temperature", :value="temperature", align-right)
-      info-table-row(title="Dew point", :value="dewPoint", align-right)
-      info-table-row(
-        title="Humidity",
-        :value="`${Math.round(props.metar.humidity.percent)}%`",
-        align-right
-      )
+  info-table(:rows="rows")
 </template>
 
 <script setup lang="ts">
@@ -42,14 +28,25 @@ const tempUnitsOpts = [
 ];
 
 const flightConditionColor = computed(() =>
-  flightCategoryColor(props.metar.flight_category)
+  flightCategoryColor(props.metar.flight_category),
 );
 
 const temperature = computed(() =>
-  processNumber(props.metar.temperature[tempUnits.value])
+  processNumber(props.metar.temperature[tempUnits.value]),
 );
 
 const dewPoint = computed(() =>
-  processNumber(props.metar.dewpoint[tempUnits.value])
+  processNumber(props.metar.dewpoint[tempUnits.value]),
 );
+
+const rows = computed(() => [
+  {
+    title: "Flight conditions",
+    value: props.metar.flight_category,
+    color: flightConditionColor.value,
+  },
+  { title: "Temperature", value: temperature.value },
+  { title: "Dew point", value: dewPoint.value },
+  { title: "Humidity", value: `${Math.round(props.metar.humidity.percent)}%` },
+]);
 </script>

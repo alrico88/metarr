@@ -1,5 +1,5 @@
 <template lang="pug">
-span.badge(v-if="category", :style="style") {{ category }}
+u-badge(v-if="category", color="neutral", :label="category", :style="style", class="text-white")
 </template>
 
 <script setup lang="ts">

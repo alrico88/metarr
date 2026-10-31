@@ -17,7 +17,7 @@ export function flightCategoryColor(category?: string): string {
 export function runwayWindComponents(
   windDegrees: number,
   windSpeed: number,
-  runwayBearing: number
+  runwayBearing: number,
 ): { headwind: number; crosswind: number } {
   const angle = ((windDegrees - runwayBearing) * Math.PI) / 180;
 
@@ -34,7 +34,7 @@ export function pressureAltitude(elevationFt: number, qnhMb: number): number {
 export function densityAltitude(
   elevationFt: number,
   qnhMb: number,
-  temperatureC: number
+  temperatureC: number,
 ): number {
   const pa = pressureAltitude(elevationFt, qnhMb);
   const isaTemperature = 15 - (2 * pa) / 1000;

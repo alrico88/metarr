@@ -10,10 +10,11 @@ const props = withDefaults(
     airport: Airport;
     height?: string;
   }>(),
-  { height: "200px" }
+  { height: "200px" },
 );
 
 const mapStyle = useMapStyle();
+
 const center = computed<[number, number]>(() => [
   props.airport.longitude,
   props.airport.latitude,
@@ -21,7 +22,7 @@ const center = computed<[number, number]>(() => [
 </script>
 
 <template lang="pug">
-.border.rounded.overflow-hidden(:style="{ height }")
+.overflow-hidden.rounded-lg.border.border-default(:style="{ height }")
   mgl-map(:map-style="mapStyle", :center="center", :zoom="10")
     mgl-navigation-control(position="top-left")
     map-marker(:coordinates="center", :label="airport.icao")
@@ -39,9 +40,10 @@ const center = computed<[number, number]>(() => [
         slot
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 :deep(.airport-map-info) {
   max-width: min(400px, calc(100% - 20px));
-  font: var(--bs-body-font-size) var(--bs-body-font-family);
+  font-family: var(--font-sans);
+  font-size: 1rem;
 }
 </style>

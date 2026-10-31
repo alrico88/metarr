@@ -9,7 +9,7 @@ const props = withDefaults(
     anchor?: "center" | "bottom";
     color?: string;
   }>(),
-  { actionLabel: undefined, anchor: "bottom", color: "#3b82b5" }
+  { actionLabel: undefined, anchor: "bottom", color: "#3b82b5" },
 );
 
 const emit = defineEmits<{ select: [] }>();
@@ -17,7 +17,7 @@ const hovered = ref(false);
 const focused = ref(false);
 const dismissed = ref(false);
 const tooltipVisible = computed(
-  () => (hovered.value || focused.value) && !dismissed.value
+  () => (hovered.value || focused.value) && !dismissed.value,
 );
 </script>
 
@@ -55,7 +55,7 @@ mgl-popup(
   span(role="tooltip") {{ label }}
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .map-marker {
   display: block;
   padding: 0;
@@ -65,7 +65,7 @@ mgl-popup(
 }
 </style>
 
-<style lang="scss">
+<style>
 .map-marker-tooltip {
   pointer-events: none;
   color: #333;

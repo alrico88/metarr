@@ -8,8 +8,8 @@ const boundsSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const { west, south, east, north } = await getValidatedQuery(event, (query) =>
-    boundsSchema.parse(query)
+  const { west, south, east, north } = await getValidatedQuery(event, query =>
+    boundsSchema.parse(query),
   );
 
   return getStationsInBounds(west, south, east, north);

@@ -1,26 +1,20 @@
 <template lang="pug">
-.container
-  .row
-    .col
-      .vstack.gap-3
-        airport-info(
-          :icao="icao",
-          :data="airportData",
-          :pending="pending",
-          :error="error != null"
-        )
-        metar-info(:icao="icao", :airport-info="airportData")
-        taf-info(:icao="icao")
-        atis-info(:icao="icao")
+u-container
+  .flex.flex-col.gap-4
+    airport-info(
+      :icao="icao",
+      :data="airportData",
+      :pending="pending",
+      :error="error != null"
+    )
+    metar-info(:icao="icao", :airport-info="airportData")
+    taf-info(:icao="icao")
+    atis-info(:icao="icao")
 </template>
 
 <script setup lang="ts">
 const route = useRoute();
 const icao = computed(() => (route.params.icao as string).toUpperCase());
-
-definePageMeta({
-  layout: "with-form",
-});
 
 const {
   data: airportData,
@@ -37,7 +31,7 @@ watch(
       addRecent(data.icao);
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 useSeoMeta({

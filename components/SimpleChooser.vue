@@ -1,12 +1,13 @@
 <template lang="pug">
-b-button-group
-  b-button.p-2(
-    variant="link",
-    v-for="option of options",
-    :key="option.value",
-    :active="selected === option.value",
-    @click="selected = option.value"
-  ) {{ option.text }}
+u-tabs(
+  v-model="selected",
+  :items="items",
+  :content="false",
+  variant="pill",
+  size="xs",
+  color="neutral",
+  :ui="{ root: 'w-auto', list: 'w-auto', trigger: 'px-2' }"
+)
 </template>
 
 <script setup lang="ts">
@@ -18,10 +19,8 @@ const props = defineProps<{
 }>();
 
 const selected = defineModel<string>();
-</script>
 
-<style lang="scss" scoped>
-.btn-link {
-  text-underline-offset: 0.2rem;
-}
-</style>
+const items = computed(() =>
+  props.options.map(option => ({ label: option.text, value: option.value })),
+);
+</script>

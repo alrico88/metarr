@@ -4,6 +4,6 @@ export function useMapStyle() {
   return computed(() =>
     colorMode.value === "light"
       ? "https://tiles.openfreemap.org/styles/liberty"
-      : "https://tiles.openfreemap.org/styles/dark"
+      : "https://tiles.openfreemap.org/styles/dark",
   );
 }

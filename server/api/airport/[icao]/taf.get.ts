@@ -18,5 +18,5 @@ export default defineCachedEventHandler(
   {
     swr: false,
     maxAge: TEN_MINUTES_IN_SECONDS,
-  }
+  },
 );

@@ -7,7 +7,7 @@ const getAtisStations = defineCachedFunction(
   {
     name: "atis-stations",
     maxAge: ONE_DAY_IN_SECONDS,
-  }
+  },
 );
 
 export async function getAtis(icao: string): Promise<Atis[]> {

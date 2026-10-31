@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+@theme static {
+  --font-sans: "Cabin", sans-serif;
+
+  --color-navy-50: #eef2fa;
+  --color-navy-100: #dbe4f4;
+  --color-navy-200: #bccbe9;
+  --color-navy-300: #94aad8;
+  --color-navy-400: #6b8bc8;
+  --color-navy-500: #1f2d4c;
+  --color-navy-600: #1a2640;
+  --color-navy-700: #151f35;
+  --color-navy-800: #10182a;
+  --color-navy-900: #0b101c;
+  --color-navy-950: #070a12;
+}
+
+html,
+body,
+#__nuxt {
+  height: 100%;
+}
+
+body {
+  background-color: #ebf4f5;
+}
+
+html.dark body {
+  background-color: #0d1520;
+}
+
+.hover-underline:hover {
+  text-decoration: underline;
+}

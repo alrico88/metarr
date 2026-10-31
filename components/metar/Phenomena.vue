@@ -1,15 +1,14 @@
 <template lang="pug">
-b-card(no-body)
+u-card
   template(#header) #[icon(name="bi:cloud-rain")] Weather phenomena
-  b-card-body.p-0
-    data-table.mb-0(
-      :fields="fields",
-      :items="metar.conditions",
-      bordered,
-      sort-column="code",
-      empty-text="No phenomena"
-    )
+  data-table(
+    :fields="fields",
+    :items="metar.conditions",
+    sort-column="code",
+    empty-text="No phenomena"
+  )
 </template>
+
 <script setup lang="ts">
 import { get } from "es-toolkit/compat";
 import type { FieldDef } from "../DataTable.vue";
@@ -64,7 +63,7 @@ const fields: FieldDef[] = [
     label: "Phenomena",
     key: "code",
     sortable: true,
-    formatter: (d) => phenomenaFormatter(d as string),
+    formatter: d => phenomenaFormatter(d as string),
   },
 ];
 </script>
