@@ -14,7 +14,5 @@ definePageMeta({
 .container
   .row
     .col
-      .vstack.gap-3
-        p.lead.mb-0 Search any airport by ICAO code to read its latest METAR and TAF in plain language: wind on each runway, flight category, clouds, visibility and more.
-        saved-airports
+      saved-airports
 </template>

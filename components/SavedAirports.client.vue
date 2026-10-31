@@ -1,5 +1,11 @@
 <script setup lang="ts">
-const { favorites, recents } = useSavedAirports();
+const {
+  favorites,
+  recents,
+  removeFavorite,
+  removeRecent,
+  clearRecents,
+} = useSavedAirports();
 </script>
 
 <template lang="pug">
@@ -8,12 +14,16 @@ const { favorites, recents } = useSavedAirports();
     airport-shortcuts(
       title="Favorites",
       :icaos="favorites",
+      @remove="removeFavorite",
       empty-text="Star an airport on its METAR page to pin it here."
     )
   .col
     airport-shortcuts(
       title="Recently viewed",
       :icaos="recents",
+      clearable,
+      @clear="clearRecents",
+      @remove="removeRecent",
       empty-text="Airports you check will show up here."
     )
 </template>

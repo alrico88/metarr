@@ -21,11 +21,26 @@ export function useSavedAirports() {
     );
   }
 
+  function removeFavorite(icao: string): void {
+    favorites.value = favorites.value.filter((d) => d !== icao);
+  }
+
+  function removeRecent(icao: string): void {
+    recents.value = recents.value.filter((d) => d !== icao);
+  }
+
+  function clearRecents(): void {
+    recents.value = [];
+  }
+
   return {
     favorites: readonly(favorites),
     recents: readonly(recents),
     isFavorite,
     toggleFavorite,
     addRecent,
+    removeFavorite,
+    removeRecent,
+    clearRecents,
   };
 }
