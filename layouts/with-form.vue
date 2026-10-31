@@ -7,7 +7,7 @@
           nuxt-link.text-decoration-none.d-inline-block(to="/")
             h1.fw-bold.mb-0 #[img(src="/logo.png", width="43", height="30")] metarr
       .row.g-3
-        .col-12.col-md-9
+        .col
           b-form(@submit.prevent="goToMetar")
             b-form-group.fw-bold(label="Search airport by ICAO:")
               .position-relative.w
@@ -31,9 +31,11 @@
                   :show="showAutocomplete",
                   @suggestion-clicked="goToMetar"
                 )
-        .col
+        .col-12.col-md-auto
           b-form-group.fw-bold(label="Search nearest:")
-            b-button.w-100(to="/nearest", variant="primary") #[icon(name="gis:gnss-antenna")] Find nearest stations
+            .d-flex.gap-2
+              b-button.flex-grow-1.text-nowrap(to="/nearest", variant="primary") #[icon(name="gis:gnss-antenna")] Find nearest stations
+              b-button.text-nowrap(to="/map", variant="primary", title="Stations map") #[icon(name="bi:map")] Map
     main
       slot
   the-footer

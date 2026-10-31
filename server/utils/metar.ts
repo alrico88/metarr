@@ -1,15 +1,15 @@
 import { metarParser } from "aewx-metar-parser";
-import buffer from "@turf/buffer";
-import { getGeoJSONBBox } from "bbox-helper-functions";
 import is from "@sindresorhus/is";
 import CheapRuler from "cheap-ruler";
 import { orderBy } from "es-toolkit";
-import { filterAndMap, mapAndFilter } from "array-fm";
+import { filterAndMap } from "array-fm";
 import papa from "papaparse";
 
 const storage = useStorage("metarr");
 
-const cacheKey = "all-metars";
+const cacheKey = "all-metars-v2";
+
+const ONE_WEEK_IN_SECONDS = 604800;
 
 export function parseMetarString(metar: string): IMetar {
   return metarParser(metar);
@@ -20,6 +20,10 @@ interface MetarStoreData {
   raw_text: string;
   latitude: number;
   longitude: number;
+  flight_category: string;
+  wind_kt?: number;
+  visibility_mi?: number;
+  wx?: string;
 }
 
 async function fetchAndStoreMetarData() {
@@ -40,6 +44,11 @@ async function fetchAndStoreMetarData() {
     raw_text: d.raw_text,
     latitude: Number(d.latitude),
     longitude: Number(d.longitude),
+    flight_category: d.flight_category,
+    // Gusts count: the filter is about the strongest wind seen.
+    wind_kt: Math.max(Number(d.wind_speed_kt) || 0, Number(d.wind_gust_kt) || 0),
+    visibility_mi: parseFloat(String(d.visibility_statute_mi)),
+    wx: String(d.wx_string ?? ""),
   }));
 
   await storage.setItem(cacheKey, data, {
@@ -55,113 +64,107 @@ async function getAllMetarData() {
   return stored || fetchAndStoreMetarData();
 }
 
-function embedMetarToStations(
-  stations: NearestStation[],
-  metars: MetarStoreData[]
-): NearestStationWithMetar[] {
-  const metarIndexer = metars.reduce(
-    (acc, d) => {
-      acc.set(d.station_id, d.raw_text);
-
-      return acc;
-    },
-    new Map() as Map<string, string>
-  );
-
-  return mapAndFilter(
-    stations,
-    (d) => ({
-      ...d,
-      metar: metarIndexer.get(d.icaoId),
-    }),
-    (d) => !is.nullOrUndefined(d.metar)
-  ) as NearestStationWithMetar[];
-}
-
-export async function getMetar(icao: string): Promise<IMetar | null> {
+export async function getMetar(icao: string): Promise<IMetar> {
   const data = await getAllMetarData();
 
-  const icaoData = data.find((d) => d.station_id === icao);
+  const icaoData = data.find((d) => d.station_id === icao.toUpperCase());
 
   if (!icaoData) {
-    throw new Error(`METAR not found for ${icao}`);
+    throw createError({
+      statusCode: 404,
+      message: `METAR not found for ${icao}`,
+    });
   }
 
   return parseMetarString(icaoData.raw_text);
 }
 
-export async function getMetars(icaos: string[]): Promise<MetarStoreData[]> {
-  const data = await getAllMetarData();
+const getStationNames = defineCachedFunction(
+  async (icaos: string[]): Promise<Record<string, string>> => {
+    const stations = await $fetch<StationInfo[]>(
+      "https://aviationweather.gov/api/data/stationinfo",
+      {
+        query: {
+          ids: icaos.join(","),
+          format: "json",
+        },
+      }
+    );
 
-  return data.filter((d) => icaos.includes(d.station_id));
-}
+    return Object.fromEntries(stations.map((d) => [d.icaoId, d.site]));
+  },
+  {
+    name: "station-names",
+    maxAge: ONE_WEEK_IN_SECONDS,
+    getKey: (icaos: string[]) => [...icaos].sort().join("-"),
+  }
+);
 
 export async function getNearestStations(
   latitude: number,
   longitude: number,
-  amount?: number,
-  bufferNm?: number
+  amount: number
 ): Promise<NearestAirport[]> {
-  const bufferToApply = bufferNm ?? 100;
-  const amountToCheck = amount ?? 10;
+  const data = await getAllMetarData();
 
-  const pointAsBuffer = buffer(
-    {
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: [longitude, latitude],
-      },
-      properties: {},
-    },
-    bufferToApply,
-    {
-      units: "nauticalmiles",
-    }
-  );
+  const ruler = new CheapRuler(latitude, "nauticalmiles");
 
-  const [minLon, minLat, maxLon, maxLat] = getGeoJSONBBox(pointAsBuffer!);
-
-  const list = await $fetch<NearestStation[]>(
-    "https://aviationweather.gov/api/data/stationinfo",
-    {
-      query: {
-        bbox: `${minLat},${minLon},${maxLat},${maxLon}`,
-        format: "json",
-      },
-    }
-  );
-
-  const metars = await getMetars((list ?? []).map((d) => d.icaoId));
-
-  const stationsWithMetar = embedMetarToStations(list, metars);
-
-  if (
-    is.emptyArray(stationsWithMetar) ||
-    stationsWithMetar.length < amountToCheck
-  ) {
-    return getNearestStations(latitude, longitude, amount, bufferToApply + 100);
-  }
-
-  const ruler = new CheapRuler(stationsWithMetar[0]?.lat ?? 0, "nauticalmiles");
-
-  const listWithDistanceAndBearing = stationsWithMetar.map((station) => ({
-    station: {
-      latitude: station.lat,
-      longitude: station.lon,
-      name: station.site,
-      icao: station.icaoId,
-    },
+  const withDistance = data.map((d) => ({
+    ...d,
     nautical_miles: ruler.distance(
       [longitude, latitude],
-      [station.lon, station.lat]
+      [d.longitude, d.latitude]
     ),
-    metar: station.metar,
   }));
 
-  return orderBy(listWithDistanceAndBearing, ["nautical_miles"], ["asc"]).slice(
+  const nearest = orderBy(withDistance, ["nautical_miles"], ["asc"]).slice(
     0,
-    amountToCheck
+    amount
+  );
+
+  const names = await getStationNames(nearest.map((d) => d.station_id));
+
+  return nearest.map((d) => ({
+    station: {
+      latitude: d.latitude,
+      longitude: d.longitude,
+      name: names[d.station_id] ?? d.station_id,
+      icao: d.station_id,
+    },
+    nautical_miles: d.nautical_miles,
+    metar: d.raw_text,
+    flight_category: d.flight_category,
+  }));
+}
+
+export async function getStationsInBounds(
+  west: number,
+  south: number,
+  east: number,
+  north: number
+): Promise<MapStation[]> {
+  const data = await getAllMetarData();
+
+  // A box that crosses the antimeridian arrives with west > east.
+  const inLongitude = (lon: number) =>
+    west <= east ? lon >= west && lon <= east : lon >= west || lon <= east;
+
+  return filterAndMap(
+    data,
+    (d) =>
+      d.latitude >= south &&
+      d.latitude <= north &&
+      inLongitude(d.longitude),
+    (d) => ({
+      icao: d.station_id,
+      latitude: d.latitude,
+      longitude: d.longitude,
+      flight_category: d.flight_category,
+      metar: d.raw_text,
+      wind_kt: d.wind_kt,
+      visibility_mi: d.visibility_mi,
+      wx: d.wx,
+    })
   );
 }
 
@@ -173,4 +176,23 @@ export async function getAvailableIcaos() {
     (d) => is.nonEmptyStringAndNotWhitespace(d?.station_id),
     (d) => d.station_id
   ).sort(Intl.Collator().compare);
+}
+
+export async function getTaf(icao: string): Promise<string> {
+  const taf = await $fetch<string>("https://aviationweather.gov/api/data/taf", {
+    query: {
+      ids: icao.toUpperCase(),
+      format: "raw",
+    },
+    responseType: "text",
+  });
+
+  if (is.emptyStringOrWhitespace(taf)) {
+    throw createError({
+      statusCode: 404,
+      message: `TAF not found for ${icao}`,
+    });
+  }
+
+  return taf.trim();
 }

@@ -2,21 +2,29 @@
 .row
   .col
     h3 METAR:
-    template(v-if="pending")
+    template(v-if="pending && !metar")
       b-alert(variant="primary", :model-value="true")
         .hstack.gap-2.align-items-center
           b-spinner
           div Loading data
-    template(v-if="!pending && (!metar || error)")
-      b-alert(variant="danger", :model-value="true") METAR not found
-    template(v-if="!pending && metar")
+    template(v-if="!pending && !metar")
+      b-alert(v-if="notFound", variant="danger", :model-value="true") METAR not found
+      b-alert(v-else, variant="danger", :model-value="true")
+        .hstack.gap-2.align-items-center.justify-content-between
+          div Couldn't load the METAR
+          b-button(size="sm", variant="danger", @click="refresh()") Retry
+    template(v-if="metar")
       .row
         .col
-          b-alert.font-monospace(variant="primary", :model-value="true") {{ metar.raw_text }}
+          b-alert(variant="primary", :model-value="true")
+            .hstack.gap-2.align-items-center
+              flight-category-badge(:category="metar.flight_category")
+              .font-monospace {{ metar.raw_text }}
+          b-alert(v-if="isStale", variant="warning", :model-value="true") This METAR is more than an hour old. The station may have stopped reporting.
       .row
         .col
           h3 Parsed METAR:
-          p.text-muted Observed {{ dayjs.utc(metar.observed).format("dddd DD MMM YYYY [at] HH:mm [Z]") }} #[span.observed-relative ({{ dayjs(metar.observed).fromNow() }})]
+          p.text-muted Observed {{ dayjs.utc(metar.observed).format("dddd DD MMM YYYY [at] HH:mm [Z]") }} #[span.observed-relative ({{ observedRelative }})]
           masonry-wall(
             :items="items",
             :ssr-columns="3",
@@ -32,6 +40,7 @@ import {
   MetarAltimeter,
   MetarClouds,
   MetarConditions,
+  MetarDerived,
   MetarPhenomena,
   MetarVisibility,
   MetarWind,
@@ -48,11 +57,31 @@ const props = defineProps<{
   airportInfo: Airport | null;
 }>();
 
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+const STALE_AFTER_MINUTES = 60;
+
 const {
   data: metar,
   error,
   pending,
-} = useLazyFetch<IMetar>(`/api/airport/${props.icao}/metar`);
+  refresh,
+} = useLazyFetch<IMetar>(() => `/api/airport/${props.icao}/metar`);
+
+useIntervalFn(refresh, REFRESH_INTERVAL_MS);
+
+const notFound = computed(() => isClientError(error.value?.statusCode));
+
+const now = useNow({ interval: 60 * 1000 });
+
+const observedRelative = computed(() =>
+  metar.value ? dayjs(metar.value.observed).from(now.value) : ""
+);
+
+const isStale = computed(
+  () =>
+    !!metar.value &&
+    dayjs(now.value).diff(metar.value.observed, "minute") > STALE_AFTER_MINUTES
+);
 
 const items = computed(() => {
   const commonProps = {
@@ -77,6 +106,13 @@ const items = computed(() => {
       component: MetarAltimeter,
       props: {
         ...commonProps,
+      },
+    },
+    {
+      component: MetarDerived,
+      props: {
+        ...commonProps,
+        airportInfo: props.airportInfo,
       },
     },
     {

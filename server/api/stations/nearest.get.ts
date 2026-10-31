@@ -1,30 +1,16 @@
 import z from "zod";
 
-const ONE_WEEK_IN_SECONDS = 604800;
+const nearestSchema = z.object({
+  latitude: z.coerce.number().min(-90).max(90),
+  longitude: z.coerce.number().min(-180).max(180),
+  amount: z.coerce.number().min(10).max(30),
+});
 
-export default defineCachedEventHandler<{
-  query: {
-    latitude: string;
-    longitude: string;
-    amount: string;
-  };
-}>(
-  async (event) => {
-    const nearestSchema = z.object({
-      latitude: z.coerce.number().min(-90).max(90),
-      longitude: z.coerce.number().min(-180).max(180),
-      amount: z.coerce.number().min(10).max(30),
-    });
+export default defineEventHandler(async (event) => {
+  const { latitude, longitude, amount } = await getValidatedQuery(
+    event,
+    (query) => nearestSchema.parse(query)
+  );
 
-    const { latitude, longitude, amount } = await getValidatedQuery(
-      event,
-      (query) => nearestSchema.parse(query)
-    );
-
-    return getNearestStations(latitude, longitude, amount);
-  },
-  {
-    swr: false,
-    maxAge: ONE_WEEK_IN_SECONDS,
-  }
-);
+  return getNearestStations(latitude, longitude, amount);
+});

@@ -30,6 +30,8 @@
               .hstack.gap-2.align-items-center.justify-content-between
                 div {{ value }}
                 heading-arrow(:azimuth="asNum(value)")
+            template(#cell(flight_category)="{ value }")
+              flight-category-badge(:category="asString(value)")
             template(#cell(metar)="{ value }")
               .font-monospace {{ value }}
             template(#cell(actions)="{ item }")
@@ -144,6 +146,11 @@ const fields: FieldDef[] = [
     formatter: (d) => processNumber(d as string).toString(),
   },
   {
+    label: "Category",
+    key: "flight_category",
+    sortable: true,
+  },
+  {
     label: "METAR",
     key: "metar",
   },
@@ -159,6 +166,10 @@ function goTo(item: unknown) {
 
 function asNum(d: unknown): number {
   return d as number;
+}
+
+function asString(d: unknown): string {
+  return d as string;
 }
 </script>
 

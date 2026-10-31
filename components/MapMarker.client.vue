@@ -7,8 +7,9 @@ const props = withDefaults(
     label: string;
     actionLabel?: string;
     anchor?: "center" | "bottom";
+    color?: string;
   }>(),
-  { actionLabel: undefined, anchor: "bottom" }
+  { actionLabel: undefined, anchor: "bottom", color: "#3b82b5" }
 );
 
 const emit = defineEmits<{ select: [] }>();
@@ -37,7 +38,7 @@ mgl-marker(:coordinates="coordinates", :anchor="anchor")
         svg(width="27", height="41", viewBox="0 0 27 41", aria-hidden="true")
           path(
             d="M13.5 40S1 24 1 14a12.5 12.5 0 0 1 25 0C26 24 13.5 40 13.5 40Z",
-            fill="#3b82b5",
+            :fill="color",
             stroke="white",
             stroke-width="2"
           )

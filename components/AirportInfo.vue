@@ -1,7 +1,9 @@
 <template lang="pug">
 .row
   .col
-    h3 Airport Info
+    .hstack.gap-1.align-items-center.mb-2
+      h3.mb-0 Airport Info
+      favorite-toggle(:icao="icao")
     template(v-if="pending")
       b-alert(variant="primary", :model-value="true")
         .hstack.gap-2.align-items-center
@@ -29,6 +31,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
+  icao: string;
   pending: boolean;
   error: boolean;
   data: Airport | null;
