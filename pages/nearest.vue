@@ -1,41 +1,33 @@
 <template lang="pug">
-.container
-  .row
-    .col
-      .hstack.gap-2.align-items-center.mb-2
-        div
-          b-form-select(:options="[10, 20, 30]", v-model="nearestAmount")
-        .flex-grow-1
-          h2.mb-0 Nearest METAR stations
-      b-alert.mb-0(variant="primary", :model-value="loadingSome")
-        .hstack.gap-2
-          b-spinner
-          div Loading
-      b-alert.mb-0(variant="danger", :model-value="userPositionError") Error getting coords. Did you allow geolocation?
-      template(v-if="!loadingSome && userPosition")
-        .vstack.gap-3
-          nearest-stations-map(
-            :position="userPosition.coords",
-            :stations="stations ?? []",
-            @select="goTo"
-          )
-          data-table(
-            v-if="stations",
-            :fields="fields",
-            sort-by="nautical_miles",
-            :items="stations",
-            bordered
-          )
-            template(#cell(bearing)="{ value }")
-              .hstack.gap-2.align-items-center.justify-content-between
-                div {{ value }}
-                heading-arrow(:azimuth="asNum(value)")
-            template(#cell(flight_category)="{ value }")
-              flight-category-badge(:category="asString(value)")
-            template(#cell(metar)="{ value }")
-              .font-monospace {{ value }}
-            template(#cell(actions)="{ item }")
-              b-button.text-nowrap(@click="goTo(item)", variant="primary") Check METAR
+u-container
+  .mb-2.flex.items-center.gap-2
+    u-select.w-24(:items="[10, 20, 30]", v-model="nearestAmount")
+    h2.text-lg.font-bold Nearest METAR stations
+  u-alert(v-if="loadingSome", color="primary", variant="subtle", title="Loading", icon="i-lucide-loader-circle", :ui="{ leadingIcon: 'animate-spin' }")
+  u-alert(v-if="userPositionError", color="error", variant="subtle", title="Error getting coords. Did you allow geolocation?")
+  .flex.flex-col.gap-4(v-if="!loadingSome && userPosition")
+    nearest-stations-map(
+      :position="userPosition.coords",
+      :stations="stations ?? []",
+      @select="goTo"
+    )
+    data-table(
+      v-if="stations",
+      :fields="fields",
+      :items="stations",
+      bordered,
+      striped,
+    )
+      template(#cell(bearing)="{ value }")
+        .flex.items-center.justify-between.gap-2
+          div {{ value }}
+          heading-arrow(:azimuth="asNum(value)")
+      template(#cell(flight_category)="{ value }")
+        flight-category-badge(:category="asString(value)")
+      template(#cell(metar)="{ value }")
+        .min-w-44.whitespace-normal.break-words.font-mono.text-xs {{ value }}
+      template(#cell(actions)="{ item }")
+        u-button.whitespace-nowrap(label="Check METAR", @click="goTo(item)")
 </template>
 
 <script setup lang="ts">
@@ -69,7 +61,7 @@ onNuxtReady(() => {
       console.error(err);
 
       coordsLoading.value = false;
-    }
+    },
   );
 });
 
@@ -78,9 +70,9 @@ const nearestAmount = ref(10);
 const { data: stations, pending: stationsLoading } = useAsyncData(
   async () => {
     if (
-      is.nullOrUndefined(userPosition.value) ||
-      is.nullOrUndefined(userPosition.value.coords.latitude) ||
-      is.nullOrUndefined(userPosition.value.coords.longitude)
+      is.nullOrUndefined(userPosition.value)
+      || is.nullOrUndefined(userPosition.value.coords.latitude)
+      || is.nullOrUndefined(userPosition.value.coords.longitude)
     ) {
       return [];
     }
@@ -104,23 +96,23 @@ const { data: stations, pending: stationsLoading } = useAsyncData(
 
     const ruler = new CheapRuler(st[0]?.station.latitude ?? 0);
 
-    return st.map((d) => ({
+    return st.map(d => ({
       ...d,
       bearing: getAzimuth(
         ruler.bearing(
           [longitude, latitude],
-          [d.station.longitude, d.station.latitude]
-        )
+          [d.station.longitude, d.station.latitude],
+        ),
       ),
     }));
   },
   {
     watch: [userPosition, nearestAmount],
-  }
+  },
 );
 
 const loadingSome = computed(
-  () => coordsLoading.value || stationsLoading.value
+  () => coordsLoading.value || stationsLoading.value,
 );
 
 const fields: FieldDef[] = [
@@ -143,7 +135,7 @@ const fields: FieldDef[] = [
     label: "Distance",
     key: "nautical_miles",
     sortable: true,
-    formatter: (d) => processNumber(d as string).toString(),
+    formatter: d => processNumber(d as string).toString(),
   },
   {
     label: "Category",
@@ -172,10 +164,3 @@ function asString(d: unknown): string {
   return d as string;
 }
 </script>
-
-<style lang="scss" scoped>
-h2 {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-</style>

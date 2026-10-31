@@ -1,4 +1,13 @@
 export default defineNuxtConfig({
+
+  modules: [
+    "@nuxt/eslint",
+    "@nuxt/ui",
+    "@vueuse/nuxt",
+    "@vite-pwa/nuxt",
+    "nuxt-umami",
+    "@nuxt/fonts",
+  ],
   app: {
     head: {
       title: "metarr",
@@ -16,17 +25,43 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ["@/assets/main.scss", "maplibre-gl/dist/maplibre-gl.css"],
+  css: ["~/assets/css/main.css"],
 
-  modules: [
-    "@nuxt/icon",
-    "@vueuse/nuxt",
-    "@vite-pwa/nuxt",
-    "@bootstrap-vue-next/nuxt",
-    "@nuxtjs/color-mode",
-    "nuxt-umami",
-    "@nuxt/fonts",
-  ],
+  colorMode: {
+    storageKey: "nuxt-color-mode",
+  },
+
+  runtimeConfig: {
+    apiToken: "",
+    airApiUrl: "https://airapi.vercel.app/api",
+    redisHost: "",
+    redisPort: "",
+    redisPassword: "",
+    redisDb: 0,
+  },
+
+  compatibilityDate: "2025-03-29",
+
+  eslint: {
+    config: {
+      stylistic: {
+        semi: true,
+        quotes: "double",
+        commaDangle: "always-multiline",
+        braceStyle: "1tbs",
+      },
+    },
+  },
+
+  fonts: {
+    families: [
+      {
+        name: "Cabin",
+        provider: "google",
+        weights: [400, 500, 700],
+      },
+    ],
+  },
 
   pwa: {
     registerType: "prompt",
@@ -58,35 +93,9 @@ export default defineNuxtConfig({
     },
   },
 
-  colorMode: {
-    dataValue: "bs-theme",
-    storageKey: "nuxt-color-mode",
-  },
-
-  runtimeConfig: {
-    apiToken: "",
-    airApiUrl: "https://airapi.vercel.app/api",
-    redisHost: "",
-    redisPort: "",
-    redisPassword: "",
-    redisDb: 0,
-  },
-
-  fonts: {
-    families: [
-      {
-        name: "Cabin",
-        provider: "google",
-        weights: [400, 500, 700],
-      },
-    ],
-  },
-
   umami: {
     host: "https://stats.alrico.es",
     id: "028ca508-e57f-4271-ac79-eed27dd31445",
     ignoreLocalhost: true,
   },
-
-  compatibilityDate: "2025-03-29",
 });

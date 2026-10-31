@@ -1,7 +1,7 @@
 import { metarParser } from "aewx-metar-parser";
 import is from "@sindresorhus/is";
 import CheapRuler from "cheap-ruler";
-import { orderBy } from "es-toolkit";
+import { identity, orderBy } from "es-toolkit";
 import { filterAndMap } from "array-fm";
 import papa from "papaparse";
 
@@ -31,7 +31,7 @@ async function fetchAndStoreMetarData() {
     "https://aviationweather.gov/data/cache/metars.cache.csv",
     {
       responseType: "text",
-    }
+    },
   );
 
   const parsed = papa.parse<Record<string, unknown> & MetarStoreData>(csv, {
@@ -39,7 +39,7 @@ async function fetchAndStoreMetarData() {
     skipEmptyLines: true,
   });
 
-  const data = parsed.data.map((d) => ({
+  const data = parsed.data.map(d => ({
     station_id: d.station_id,
     raw_text: d.raw_text,
     latitude: Number(d.latitude),
@@ -67,7 +67,7 @@ async function getAllMetarData() {
 export async function getMetar(icao: string): Promise<IMetar> {
   const data = await getAllMetarData();
 
-  const icaoData = data.find((d) => d.station_id === icao.toUpperCase());
+  const icaoData = data.find(d => d.station_id === icao.toUpperCase());
 
   if (!icaoData) {
     throw createError({
@@ -88,43 +88,44 @@ const getStationNames = defineCachedFunction(
           ids: icaos.join(","),
           format: "json",
         },
-      }
+      },
     );
 
-    return Object.fromEntries(stations.map((d) => [d.icaoId, d.site]));
+    return Object.fromEntries(stations.map(d => [d.icaoId, d.site]));
   },
   {
     name: "station-names",
     maxAge: ONE_WEEK_IN_SECONDS,
-    getKey: (icaos: string[]) => [...icaos].sort().join("-"),
-  }
+    getKey: (icaos: string[]) =>
+      orderBy(icaos, [identity], ["asc"]).join("-"),
+  },
 );
 
 export async function getNearestStations(
   latitude: number,
   longitude: number,
-  amount: number
+  amount: number,
 ): Promise<NearestAirport[]> {
   const data = await getAllMetarData();
 
   const ruler = new CheapRuler(latitude, "nauticalmiles");
 
-  const withDistance = data.map((d) => ({
+  const withDistance = data.map(d => ({
     ...d,
     nautical_miles: ruler.distance(
       [longitude, latitude],
-      [d.longitude, d.latitude]
+      [d.longitude, d.latitude],
     ),
   }));
 
   const nearest = orderBy(withDistance, ["nautical_miles"], ["asc"]).slice(
     0,
-    amount
+    amount,
   );
 
-  const names = await getStationNames(nearest.map((d) => d.station_id));
+  const names = await getStationNames(nearest.map(d => d.station_id));
 
-  return nearest.map((d) => ({
+  return nearest.map(d => ({
     station: {
       latitude: d.latitude,
       longitude: d.longitude,
@@ -141,7 +142,7 @@ export async function getStationsInBounds(
   west: number,
   south: number,
   east: number,
-  north: number
+  north: number,
 ): Promise<MapStation[]> {
   const data = await getAllMetarData();
 
@@ -151,11 +152,11 @@ export async function getStationsInBounds(
 
   return filterAndMap(
     data,
-    (d) =>
-      d.latitude >= south &&
-      d.latitude <= north &&
-      inLongitude(d.longitude),
-    (d) => ({
+    d =>
+      d.latitude >= south
+      && d.latitude <= north
+      && inLongitude(d.longitude),
+    d => ({
       icao: d.station_id,
       latitude: d.latitude,
       longitude: d.longitude,
@@ -164,18 +165,22 @@ export async function getStationsInBounds(
       wind_kt: d.wind_kt,
       visibility_mi: d.visibility_mi,
       wx: d.wx,
-    })
+    }),
   );
 }
 
 export async function getAvailableIcaos() {
   const data = await getAllMetarData();
 
-  return filterAndMap(
-    data,
-    (d) => is.nonEmptyStringAndNotWhitespace(d?.station_id),
-    (d) => d.station_id
-  ).sort(Intl.Collator().compare);
+  return orderBy(
+    filterAndMap(
+      data,
+      d => is.nonEmptyStringAndNotWhitespace(d?.station_id),
+      d => d.station_id,
+    ),
+    [identity],
+    ["asc"],
+  );
 }
 
 export async function getTaf(icao: string): Promise<string> {

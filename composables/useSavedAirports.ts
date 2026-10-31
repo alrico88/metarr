@@ -1,3 +1,5 @@
+import { identity, orderBy } from "es-toolkit";
+
 const MAX_RECENTS = 8;
 
 export function useSavedAirports() {
@@ -10,23 +12,23 @@ export function useSavedAirports() {
 
   function toggleFavorite(icao: string): void {
     favorites.value = isFavorite(icao)
-      ? favorites.value.filter((d) => d !== icao)
-      : [...favorites.value, icao].sort();
+      ? favorites.value.filter(d => d !== icao)
+      : orderBy([...favorites.value, icao], [identity], ["asc"]);
   }
 
   function addRecent(icao: string): void {
-    recents.value = [icao, ...recents.value.filter((d) => d !== icao)].slice(
+    recents.value = [icao, ...recents.value.filter(d => d !== icao)].slice(
       0,
-      MAX_RECENTS
+      MAX_RECENTS,
     );
   }
 
   function removeFavorite(icao: string): void {
-    favorites.value = favorites.value.filter((d) => d !== icao);
+    favorites.value = favorites.value.filter(d => d !== icao);
   }
 
   function removeRecent(icao: string): void {
-    recents.value = recents.value.filter((d) => d !== icao);
+    recents.value = recents.value.filter(d => d !== icao);
   }
 
   function clearRecents(): void {

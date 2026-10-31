@@ -1,40 +1,25 @@
 <template lang="pug">
-b-overlay(:show="busy")
-  .table-responsive.mb-0
-    table.table.align-middle(:class="classes")
-      thead(:class="theadClass")
-        tr
-          th(
-            v-for="field of fields",
-            :key="field.key",
-            :class="{ 'cursor-pointer': field.sortable === true }",
-            @click="handleColumnClick(field)"
-          )
-            .hstack.gap-1.align-items-center
-              icon(
-                v-if="field.sortable",
-                :name="getIconName(field)",
-                :style="{ opacity: field.key !== sortColumn ? 0.2 : 1 }"
-              )
-              div {{ field.label }}
-      tbody
-        tr(v-if="sortedItems.length === 0")
-          td(:colspan="fields.length") {{ emptyText }}
-        tr(v-for="row, index of sortedItems", :key="row._id")
-          td(v-for="field of fields", :key="field.key")
-            slot(
-              :name="$slots[`cell(${String(field.key)})`] ? `cell(${String(field.key)})` : 'cell()'",
-              :value="get(row, field.key)",
-              :index="index",
-              :item="row"
-            ) {{ getRowValue(row, field) }}
+u-table(
+  v-model:sorting="sorting",
+  :data="items",
+  :columns="columns",
+  :loading="busy",
+  :ui="ui"
+)
+  template(v-for="field of fields", :key="field.key", #[`${field.key}-cell`]="{ row }")
+    slot(
+      :name="`cell(${field.key})`",
+      :value="get(row.original, field.key)",
+      :item="row.original"
+    ) {{ getRowValue(row.original, field) }}
+  template(#empty) {{ emptyText }}
 </template>
 
 <script setup lang="ts">
+import type { TableColumn } from "@nuxt/ui";
+import type { SortingState } from "@tanstack/vue-table";
 import is from "@sindresorhus/is";
-import { orderBy } from "es-toolkit";
 import { get } from "es-toolkit/compat";
-import { nanoid } from "nanoid";
 
 export interface FieldDef {
   key: string;
@@ -46,7 +31,7 @@ export interface FieldDef {
 const props = withDefaults(
   defineProps<{
     bordered?: boolean;
-    borderless?: boolean;
+    striped?: boolean;
     items?: Record<string, unknown>[];
     fields: FieldDef[];
     emptyText?: string;
@@ -54,10 +39,9 @@ const props = withDefaults(
   }>(),
   {
     items: () => [],
-    fields: () => [],
     emptyText: "No items",
     busy: false,
-  }
+  },
 );
 const sortColumn = defineModel<string>("sortColumn", {
   required: false,
@@ -68,67 +52,72 @@ const sortOrder = defineModel<"asc" | "desc">("sortOrder", {
   default: "asc",
 });
 
-const colorMode = useColorMode();
-const theadClass = computed(() => `table-${colorMode.value}`);
+const UButton = resolveComponent("UButton");
 
-const classes = computed(() => ({
-  "table-bordered": props.bordered,
-  "table-borderless": props.borderless,
-}));
+const ui = computed(() => {
+  const divider = props.bordered ? "border-e border-default last:border-e-0" : "";
+
+  return {
+    root: props.bordered ? "rounded-lg border border-default bg-default" : "",
+    tr: props.striped ? "even:bg-elevated/70" : "",
+    th: `py-1 ${divider}`,
+    td: divider,
+  };
+});
+
+const sorting = computed<SortingState>({
+  get: () =>
+    sortColumn.value
+      ? [{ id: sortColumn.value, desc: sortOrder.value === "desc" }]
+      : [],
+  set: (val) => {
+    const [first] = val;
+
+    sortColumn.value = first?.id ?? "";
+    sortOrder.value = first?.desc ? "desc" : "asc";
+  },
+});
 
 watch(
   () => props.fields,
   (val) => {
     sortColumn.value = val[0]!.key;
-  }
+  },
 );
 
-function handleColumnClick(field: FieldDef) {
-  if (!field.sortable) {
-    return;
-  }
-
-  if (sortColumn.value === field.key) {
-    sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
-  } else {
-    sortColumn.value = field.key;
-    sortOrder.value = "asc";
-  }
-}
-
-interface ItemWithId extends Record<string, unknown> {
-  _id: string;
-}
-
-const itemsWithIds = computed<ItemWithId[]>(() =>
-  props.items.map((d) => ({
-    ...d,
-    _id: nanoid(),
-  }))
-);
-
-const sortedItems = computed(() =>
-  orderBy(
-    itemsWithIds.value,
-    [sortColumn.value as keyof ItemWithId],
-    [sortOrder.value]
-  )
-);
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getRowValue(item: Record<string, unknown>, fieldDef: FieldDef): any {
   return is.function(fieldDef.formatter)
     ? fieldDef.formatter(get(item, fieldDef.key))
     : get(item, fieldDef.key);
 }
 
-function getIconName(field: FieldDef): string {
-  if (field.key === sortColumn.value) {
-    return sortOrder.value === "asc"
-      ? "ph:sort-ascending-bold"
-      : "ph:sort-descending-bold";
-  } else {
-    return "solar:sort-vertical-broken";
+function sortIcon(sorted: false | "asc" | "desc"): string {
+  if (sorted === "asc") {
+    return "i-lucide-arrow-up-narrow-wide";
   }
+
+  return sorted === "desc"
+    ? "i-lucide-arrow-down-wide-narrow"
+    : "i-lucide-arrow-up-down";
 }
+
+const columns = computed<TableColumn<Record<string, unknown>>[]>(() =>
+  props.fields.map(field => ({
+    id: field.key,
+    accessorFn: row => get(row, field.key),
+    enableSorting: field.sortable === true,
+    header: ({ column }) =>
+      field.sortable
+        ? h(UButton, {
+            color: "neutral",
+            variant: "ghost",
+            label: field.label,
+            icon: sortIcon(column.getIsSorted()),
+            class: "-mx-2.5 font-semibold",
+            onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+          })
+        : field.label,
+    cell: ({ row }) => getRowValue(row.original, field),
+  })),
+);
 </script>

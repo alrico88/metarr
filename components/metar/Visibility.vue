@@ -1,19 +1,18 @@
 <template lang="pug">
-b-card
+u-card
   template(#header)
-    .hstack.gap-2.justify-content-between.align-items-center
+    .flex.items-center.justify-between.gap-2
       div #[icon(name="tabler:eye-check")] Visibility
       simple-chooser(:options="unitOpts", v-model="units")
-  table.table.table-borderless.mb-0
-    tbody
-      info-table-row(title="CAVOK", :value="cavok.toString()", align-right)
-        template(#value="{ value }")
-          icon(
-            :name="value === 'true' ? 'tabler:square-rounded-check' : 'tabler:square-rounded-x'",
-            :style="{ color: value === 'true' ? 'green' : 'red' }",
-            size="30"
-          )
-      info-table-row(title="Distance", :value="visibility", align-right)
+  info-table(:rows="rows")
+    template(#value="{ row }")
+      icon(
+        v-if="row.title === 'CAVOK'",
+        :name="cavok ? 'tabler:square-rounded-check' : 'tabler:square-rounded-x'",
+        :style="{ color: cavok ? 'green' : 'red' }",
+        size="30"
+      )
+      .font-mono(v-else) {{ row.value }}
 </template>
 
 <script setup lang="ts">
@@ -41,4 +40,9 @@ const unitOpts = [
 ];
 
 const cavok = computed(() => props.metar.raw_parts.includes("CAVOK"));
+
+const rows = computed(() => [
+  { title: "CAVOK", value: cavok.value.toString() },
+  { title: "Distance", value: visibility.value },
+]);
 </script>

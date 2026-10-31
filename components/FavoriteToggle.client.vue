@@ -7,18 +7,17 @@ const { isFavorite, toggleFavorite } = useSavedAirports();
 
 const favorite = computed(() => isFavorite(props.icao));
 const label = computed(() =>
-  favorite.value ? "Remove from favorites" : "Add to favorites"
+  favorite.value ? "Remove from favorites" : "Add to favorites",
 );
 </script>
 
 <template lang="pug">
-b-button(
-  variant="link",
+u-button(
+  :variant="favorite ? 'soft' : 'outline'",
   size="sm",
-  :aria-label="label",
-  :title="label",
+  :icon="favorite ? 'bi:star-fill' : 'bi:star'",
+  :label="label",
   :aria-pressed="favorite",
   @click="toggleFavorite(icao)"
 )
-  icon(:name="favorite ? 'bi:star-fill' : 'bi:star'", size="20")
 </template>

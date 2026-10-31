@@ -11,7 +11,7 @@ const props = defineProps<{
 const maxHeight = computed(() => (props.height ? `${props.height}px` : "auto"));
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .scroller {
   max-height: v-bind("maxHeight");
 }

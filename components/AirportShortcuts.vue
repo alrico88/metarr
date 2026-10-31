@@ -10,28 +10,32 @@ const emit = defineEmits<{ clear: []; remove: [icao: string] }>();
 </script>
 
 <template lang="pug">
-b-card
+u-card(:ui="{ body: 'p-4 sm:p-4' }")
   template(#header)
-    .hstack.gap-2.justify-content-between.align-items-center
+    .flex.items-center.justify-between.gap-2
       div {{ title }}
-      b-button(
+      u-button(
         v-if="clearable && icaos.length",
         variant="link",
-        size="sm",
-        class="p-0",
+        size="xs",
+        label="Clear",
         @click="emit('clear')"
-      ) Clear
-  .hstack.gap-2.flex-wrap(v-if="icaos.length")
-    b-button-group(v-for="icao of icaos", :key="icao", size="sm")
-      b-button.font-monospace(
+      )
+  .flex.flex-wrap.gap-2(v-if="icaos.length")
+    u-field-group(v-for="icao of icaos", :key="icao")
+      u-button.font-mono(
         :to="`/metar/${icao}`",
-        variant="outline-primary"
-      ) {{ icao }}
-      b-button(
-        variant="outline-primary",
+        variant="outline",
+        size="sm",
+        :label="icao"
+      )
+      u-button(
+        variant="outline",
+        size="sm",
+        icon="bi:x-lg",
         :aria-label="`Remove ${icao}`",
         :title="`Remove ${icao}`",
         @click="emit('remove', icao)"
-      ) #[icon(name="bi:x-lg")]
+      )
   .text-muted(v-else) {{ emptyText }}
 </template>

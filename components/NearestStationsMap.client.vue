@@ -33,15 +33,15 @@ const bounds = computed<LngLatBoundsLike | undefined>(() => {
 });
 
 const markers = computed(() =>
-  props.stations.map((item) => ({
+  props.stations.map(item => ({
     item,
     color: flightCategoryColor(item.flight_category),
-  }))
+  })),
 );
 </script>
 
 <template lang="pug">
-.border.rounded.overflow-hidden(style="height: 300px")
+.overflow-hidden.rounded-lg.border.border-default(style="height: 300px")
   mgl-map(
     :map-style="mapStyle",
     :center="center",

@@ -4,15 +4,11 @@ useSeoMeta({
   description: "Check any airport's METAR in a human-readable format",
   keywords: "airport,metar,taf,free,wind,clouds,parse,human readable",
 });
-
-definePageMeta({
-  layout: "with-form",
-});
 </script>
 
 <template lang="pug">
-.container
-  .row
-    .col
-      saved-airports
+u-container.flex.flex-col.gap-6
+  u-form-field(label="Search airport by ICAO:", :ui="{ label: 'font-bold' }")
+    airport-search
+  saved-airports
 </template>

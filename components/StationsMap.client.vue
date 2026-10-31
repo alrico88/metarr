@@ -1,5 +1,5 @@
 <template lang="pug">
-.stations-map.position-relative.border.rounded.overflow-hidden
+.stations-map.relative.overflow-hidden.rounded-lg.border.border-default
   mgl-map(
     :map-style="mapStyle",
     :center="INITIAL_CENTER",
@@ -41,35 +41,43 @@
       class-name="station-tooltip"
     )
       div(role="tooltip")
-        .hstack.gap-2.mb-1
+        .mb-1.flex.items-center.gap-2
           strong {{ hovered.icao }}
           flight-category-badge(:category="hovered.flight_category")
-        .font-monospace.small.mb-2 {{ hovered.metar }}
-        b-table-simple.mb-0(v-if="decodedRows.length", small, borderless)
-          b-tbody
-            b-tr(v-for="row of decodedRows", :key="row.label")
-              b-th.fw-normal.text-muted {{ row.label }}
-              b-td {{ row.value }}
-        .small.text-muted(v-else-if="decoded === 'error'") Couldn't decode this METAR
-        .hstack.gap-2.small.text-muted(v-else)
-          b-spinner(small)
+        .mb-2.font-mono.text-xs {{ hovered.metar }}
+        table.w-full(v-if="decodedRows.length")
+          tbody
+            tr(v-for="row of decodedRows", :key="row.label")
+              th.pr-3.text-left.font-normal.opacity-60 {{ row.label }}
+              td {{ row.value }}
+        .text-xs.opacity-60(v-else-if="decoded === 'error'") Couldn't decode this METAR
+        .flex.items-center.gap-2.text-xs.opacity-60(v-else)
+          icon.animate-spin(name="i-lucide-loader-circle")
           | Decoding...
-  .position-absolute.top-0.start-0.mt-2.filters(style="margin-left: 3.2rem")
-    b-form-checkbox-group(v-model="conditions", :options="CONDITIONS", buttons, button-variant="outline-secondary", size="sm", class="bg-body flex-wrap")
-  .position-absolute.bottom-0.end-0.m-2.mb-4
-    b-form-checkbox.bg-body.rounded.px-5.py-1.small(v-model="showClouds", switch) Clouds (IR)
-  .position-absolute.top-0.end-0.m-2
-    b-badge(v-if="zoomedOut", variant="secondary") Zoom in to see stations
-    b-badge(v-else-if="loading", variant="secondary")
-      b-spinner.me-1(small)
-      | Loading stations
-    b-badge(v-else-if="failed", variant="danger") Couldn't load stations
-    b-badge(v-else, variant="light", border-variant="secondary") {{ visibleStations.length }} / {{ stations.length }} stations
-  b-card.position-absolute.bottom-0.start-0.m-2.small(no-body)
-    b-form-checkbox-group.vstack.gap-1.p-2(v-model="categories", stacked)
-      b-form-checkbox(v-for="c of CATEGORIES", :key="c", :value="c")
-        span.dot.me-1(:style="{ backgroundColor: flightCategoryColor(c) }")
-        | {{ c }}
+  .absolute.left-0.top-0.mt-2.flex.gap-1.overflow-x-auto(class="ml-[3.2rem] mr-36 sm:mr-0 sm:flex-wrap")
+    u-button(
+      v-for="c of CONDITIONS",
+      :key="c.value",
+      size="xs",
+      color="neutral",
+      class="shrink-0 whitespace-nowrap",
+      :variant="conditions.includes(c.value) ? 'solid' : 'outline'",
+      :label="c.text",
+      :aria-pressed="conditions.includes(c.value)",
+      @click="toggleCondition(c.value)"
+    )
+  .absolute.bottom-0.right-0.m-2.rounded.bg-default.px-3.py-1.text-sm(class="mb-14 sm:mb-8")
+    u-switch(v-model="showClouds", label="Clouds (IR)", size="sm")
+  .absolute.right-0.top-0.m-2
+    u-badge(v-if="zoomedOut", color="neutral", variant="subtle", label="Zoom in to see stations")
+    u-badge(v-else-if="loading", color="neutral", variant="subtle", icon="i-lucide-loader-circle", :ui="{ leadingIcon: 'animate-spin' }", label="Loading stations")
+    u-badge(v-else-if="failed", color="error", variant="subtle", label="Couldn't load stations")
+    u-badge(v-else, color="neutral", variant="outline", :label="`${visibleStations.length} / ${stations.length} stations`")
+  u-card.absolute.bottom-0.left-0.m-2.text-sm(class="mb-14 sm:mb-2", :ui="{ body: 'p-2 sm:p-2' }")
+    u-checkbox-group(v-model="categories", :items="CATEGORY_ITEMS", size="sm", :ui="{ fieldset: 'gap-1' }")
+      template(#label="{ item }")
+        span.dot.mr-1(:style="{ backgroundColor: flightCategoryColor(item.value) }")
+        | {{ item.label }}
 </template>
 
 <script setup lang="ts">
@@ -107,7 +115,7 @@ const CIRCLE_PAINT = {
   "circle-color": [
     "match",
     ["get", "flight_category"],
-    ...["VFR", "MVFR", "IFR", "LIFR"].flatMap((c) => [c, flightCategoryColor(c)]),
+    ...["VFR", "MVFR", "IFR", "LIFR"].flatMap(c => [c, flightCategoryColor(c)]),
     flightCategoryColor(),
   ],
   "circle-radius": ["interpolate", ["linear"], ["zoom"], 2, 4, 8, 7, 12, 10],
@@ -127,19 +135,26 @@ const CONDITIONS = [
   { value: "thunder", text: "Thunderstorm", test: (s: MapStation) => /TS/.test(s.wx ?? "") },
 ];
 const CATEGORIES = ["VFR", "MVFR", "IFR", "LIFR"];
+const CATEGORY_ITEMS = CATEGORIES.map(c => ({ label: c, value: c }));
 
 const showClouds = useLocalStorage("metarr:map-clouds", false);
 
 const categories = ref([...CATEGORIES]);
 const conditions = ref<string[]>([]);
 
+function toggleCondition(value: string) {
+  conditions.value = conditions.value.includes(value)
+    ? conditions.value.filter(c => c !== value)
+    : [...conditions.value, value];
+}
+
 const stations = shallowRef<MapStation[]>([]);
 const visibleStations = computed(() => {
-  const tests = CONDITIONS.filter((c) => conditions.value.includes(c.value));
+  const tests = CONDITIONS.filter(c => conditions.value.includes(c.value));
   return stations.value.filter(
-    (s) =>
-      (!CATEGORIES.includes(s.flight_category) || categories.value.includes(s.flight_category)) &&
-      tests.every((c) => c.test(s))
+    s =>
+      (!CATEGORIES.includes(s.flight_category) || categories.value.includes(s.flight_category))
+      && tests.every(c => c.test(s)),
   );
 });
 const loading = ref(false);
@@ -149,12 +164,12 @@ const hovered = shallowRef<MapStation | null>(null);
 
 const decodedCache = reactive(new Map<string, IMetar | "error">());
 const decoded = computed(() =>
-  hovered.value ? decodedCache.get(hovered.value.icao) : undefined
+  hovered.value ? decodedCache.get(hovered.value.icao) : undefined,
 );
 
 const geoJson = computed(() => ({
   type: "FeatureCollection" as const,
-  features: visibleStations.value.map((s) => ({
+  features: visibleStations.value.map(s => ({
     type: "Feature" as const,
     geometry: { type: "Point" as const, coordinates: [s.longitude, s.latitude] },
     properties: { icao: s.icao, flight_category: s.flight_category },
@@ -189,11 +204,11 @@ async function loadStations() {
 
   // The loaded box is still enough while the view stays inside it.
   if (
-    fetchedBox &&
-    view.west >= fetchedBox.west &&
-    view.east <= fetchedBox.east &&
-    view.south >= fetchedBox.south &&
-    view.north <= fetchedBox.north
+    fetchedBox
+    && view.west >= fetchedBox.west
+    && view.east <= fetchedBox.east
+    && view.south >= fetchedBox.south
+    && view.north <= fetchedBox.north
   ) {
     loading.value = false;
 
@@ -245,7 +260,7 @@ function onLoad(e: { map: MaplibreMap }) {
 // Layer events are MapLibre's own events, so `target` is the map.
 function onHover(e: MapLayerMouseEvent) {
   const icao = e.features?.[0]?.properties?.icao;
-  const station = stations.value.find((s) => s.icao === icao) ?? null;
+  const station = stations.value.find(s => s.icao === icao) ?? null;
 
   if (station?.icao === hovered.value?.icao) {
     return;
@@ -285,7 +300,7 @@ async function fetchDecoded(icao: string) {
       icao,
       await $fetch<IMetar>(`/api/airport/${icao}/metar`, {
         signal: current.signal,
-      })
+      }),
     );
   } catch {
     if (current.signal.aborted) {
@@ -311,8 +326,8 @@ const decodedRows = computed(() => {
   const gust = m.wind.gust_kts ? ` G${m.wind.gust_kts}` : "";
   // The parser leaves one of the two units null depending on whether the METAR uses A or Q.
   const { hg, mb } = m.barometer;
-  const altimeter =
-    [hg != null && `${hg.toFixed(2)} inHg`, mb != null && `${Math.round(mb)} hPa`]
+  const altimeter
+    = [hg != null && `${hg.toFixed(2)} inHg`, mb != null && `${Math.round(mb)} hPa`]
       .filter(Boolean)
       .join(" · ") || "-";
   const ceiling = m.ceiling?.feet ? `${m.ceiling.feet} ft` : "None";
@@ -327,15 +342,10 @@ const decodedRows = computed(() => {
 });
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .stations-map {
   height: calc(100vh - 220px);
   min-height: 420px;
-}
-
-.filters :deep(.btn) {
-  --bs-btn-color: var(--bs-body-color);
-  --bs-btn-border-color: var(--bs-border-color);
 }
 
 .dot {
@@ -346,20 +356,15 @@ const decodedRows = computed(() => {
 }
 </style>
 
-<style lang="scss">
+<style>
 .station-tooltip {
   pointer-events: none;
   color: #333;
   font-size: 13px;
+}
 
-  .maplibregl-popup-content {
-    padding: 8px 10px;
-    pointer-events: none;
-  }
-
-  .table {
-    --bs-table-bg: transparent;
-    --bs-table-color: #333;
-  }
+.station-tooltip .maplibregl-popup-content {
+  padding: 8px 10px;
+  pointer-events: none;
 }
 </style>

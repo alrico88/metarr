@@ -1,32 +1,23 @@
 <template lang="pug">
-.row
-  .col
-    .hstack.gap-1.align-items-center.mb-2
-      h3.mb-0 Airport Info
+div
+  .mb-2.flex.flex-wrap.items-center.justify-between.gap-2
+    h3.text-2xl.font-medium Airport Info
+    .flex.items-center.gap-2
+      u-button(
+        v-if="data",
+        :to="`/airport/${data.icao}`",
+        variant="outline",
+        size="sm",
+        icon="bi:map",
+        label="View map"
+      )
       favorite-toggle(:icao="icao")
-    template(v-if="pending")
-      b-alert(variant="primary", :model-value="true")
-        .hstack.gap-2.align-items-center
-          b-spinner
-          div Loading data
-    template(v-if="!pending && (!data || error)")
-      b-alert(variant="danger", :model-value="true") Airport not found
-    template(v-if="!pending && data")
-      .row.row-cols-1.row-cols-md-2.g-3
-        .col.h-100
-          b-list-group
-            airport-info-row(title="ICAO", :value="data.icao")
-            airport-info-row(title="Airport name", :value="data.name")
-            airport-info-row(title="Municipality", :value="data.municipality")
-            airport-info-row(
-              title="Elevation",
-              :value="`${data.elevation} feet`"
-            )
-            airport-info-row(title="Runways", :value="data.runwayCount")
-        .col.h-100
-          airport-map(:airport="data", height="200px")
-          .text-center
-            nuxt-link(:to="`/airport/${data.icao}`") View map
+  u-alert(v-if="pending", color="primary", variant="subtle", title="Loading data", icon="i-lucide-loader-circle", :ui="{ leadingIcon: 'animate-spin' }")
+  u-alert(v-else-if="!data || error", color="error", variant="subtle", title="Airport not found")
+  .grid.grid-cols-1.items-start.gap-4(v-else, class="md:grid-cols-2")
+    u-card
+      info-table(:rows="rows")
+    airport-map(:airport="data", height="200px")
 </template>
 
 <script setup lang="ts">
@@ -36,4 +27,16 @@ const props = defineProps<{
   error: boolean;
   data: Airport | null;
 }>();
+
+const rows = computed(() =>
+  props.data
+    ? [
+        { title: "ICAO", value: props.data.icao },
+        { title: "Airport name", value: props.data.name },
+        { title: "Municipality", value: props.data.municipality },
+        { title: "Elevation", value: `${props.data.elevation} feet` },
+        { title: "Runways", value: props.data.runwayCount },
+      ]
+    : [],
+);
 </script>

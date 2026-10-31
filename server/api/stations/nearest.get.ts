@@ -9,7 +9,7 @@ const nearestSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { latitude, longitude, amount } = await getValidatedQuery(
     event,
-    (query) => nearestSchema.parse(query)
+    query => nearestSchema.parse(query),
   );
 
   return getNearestStations(latitude, longitude, amount);
