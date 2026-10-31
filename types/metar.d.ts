@@ -50,22 +50,9 @@ declare interface IMetar {
   icao_flight_category: string;
 }
 
-declare interface NearestStation {
+declare interface StationInfo {
   icaoId: string;
-  iataId: string;
-  faaId: string;
-  wmoId: string;
-  lat: number;
-  lon: number;
-  elev: number;
   site: string;
-  state: string;
-  country: string;
-  priority: number;
-}
-
-declare interface NearestStationWithMetar extends NearestStation {
-  metar: string;
 }
 
 declare interface NearestAirport {
@@ -77,4 +64,16 @@ declare interface NearestAirport {
   };
   nautical_miles: number;
   metar: string;
+  flight_category: string;
+}
+
+declare interface MapStation {
+  icao: string;
+  latitude: number;
+  longitude: number;
+  flight_category: string;
+  metar: string;
+  wind_kt?: number;
+  visibility_mi?: number;
+  wx?: string;
 }

@@ -31,6 +31,13 @@ const bounds = computed<LngLatBoundsLike | undefined>(() => {
     [Math.max(...longitudes), Math.max(...latitudes)],
   ];
 });
+
+const markers = computed(() =>
+  props.stations.map((item) => ({
+    item,
+    color: flightCategoryColor(item.flight_category),
+  }))
+);
 </script>
 
 <template lang="pug">
@@ -46,10 +53,11 @@ const bounds = computed<LngLatBoundsLike | undefined>(() => {
     map-marker(:coordinates="center", label="Your position", anchor="center")
       img(src="/crosshair.png", width="30", height="30", alt="")
     map-marker(
-      v-for="item of stations",
-      :key="item.station.icao + item.station.name",
+      v-for="{ item, color } of markers",
+      :key="item.station.icao",
       :coordinates="[item.station.longitude, item.station.latitude]",
       :label="item.station.icao",
+      :color="color",
       :action-label="`Check METAR for ${item.station.icao}`",
       @select="emit('select', item)"
     )

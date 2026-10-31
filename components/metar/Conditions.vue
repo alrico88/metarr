@@ -41,18 +41,9 @@ const tempUnitsOpts = [
   },
 ];
 
-const flightConditionColor = computed(() => {
-  switch (props.metar.flight_category) {
-    case "VFR":
-      return "#4caf50";
-    case "MVFR":
-      return "#F6C244";
-    case "IFR":
-      return "#ff5722";
-    default:
-      return "#d32f2f";
-  }
-});
+const flightConditionColor = computed(() =>
+  flightCategoryColor(props.metar.flight_category)
+);
 
 const temperature = computed(() =>
   processNumber(props.metar.temperature[tempUnits.value])

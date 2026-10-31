@@ -10,7 +10,6 @@ b-card(no-body)
       empty-text="No phenomena"
     )
 </template>
-ß
 <script setup lang="ts">
 import { get } from "es-toolkit/compat";
 import type { FieldDef } from "../DataTable.vue";

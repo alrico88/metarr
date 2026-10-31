@@ -11,9 +11,6 @@ dependencies:
   '@sindresorhus/is':
     specifier: ^7.2.0
     version: 7.2.0
-  '@turf/buffer':
-    specifier: ^7.3.1
-    version: 7.3.1
   '@vueuse/core':
     specifier: ^14.1.0
     version: 14.1.0(vue@3.5.26)
@@ -32,9 +29,6 @@ dependencies:
   array-fm:
     specifier: ^1.0.0
     version: 1.0.0
-  bbox-helper-functions:
-    specifier: ^4.0.1
-    version: 4.0.1
   cheap-ruler:
     specifier: ^4.0.0
     version: 4.0.0
@@ -3390,75 +3384,6 @@ packages:
       tslib: 2.8.1
     dev: true
 
-  /@turf/bbox@7.3.1:
-    resolution: {integrity: sha512-/IyMKoS7P9B0ch5PIlQ6gMfoE8gRr48+cSbzlyexvEjuDuaAV1VURjH1jAthS0ipFG8RrFxFJKnp7TLL1Skong==}
-    dependencies:
-      '@turf/helpers': 7.3.1
-      '@turf/meta': 7.3.1
-      '@types/geojson': 7946.0.16
-      tslib: 2.8.1
-    dev: false
-
-  /@turf/buffer@7.3.1:
-    resolution: {integrity: sha512-jtdI0Ir3GwPyY1V2dFX039HNhD8MIYLX39c7b9AZdLh7kBuD2VgXJmPvhtnivqMV2SmRlS4fd9cKzNj369/cGg==}
-    dependencies:
-      '@turf/bbox': 7.3.1
-      '@turf/center': 7.3.1
-      '@turf/helpers': 7.3.1
-      '@turf/jsts': 2.7.2
-      '@turf/meta': 7.3.1
-      '@turf/projection': 7.3.1
-      '@types/geojson': 7946.0.16
-      d3-geo: 1.7.1
-    dev: false
-
-  /@turf/center@7.3.1:
-    resolution: {integrity: sha512-czqNKLGGdik3phYsWCK5SHKBRkDulUArMlG4v62IQcNcRFq9MbOGqyN21GSshSMO792ynDeWzdXdcKmycQ14Yg==}
-    dependencies:
-      '@turf/bbox': 7.3.1
-      '@turf/helpers': 7.3.1
-      '@types/geojson': 7946.0.16
-      tslib: 2.8.1
-    dev: false
-
-  /@turf/clone@7.3.1:
-    resolution: {integrity: sha512-r7xDOfw9ohA7PhZW+8X9RMsO4szB4YqkhEROaELJyLtQ1bo8VNFtndpZdE6YHQpD7Pjlvlb6i99q8w1QLisEPg==}
-    dependencies:
-      '@turf/helpers': 7.3.1
-      '@types/geojson': 7946.0.16
-      tslib: 2.8.1
-    dev: false
-
-  /@turf/helpers@7.3.1:
-    resolution: {integrity: sha512-zkL34JVhi5XhsuMEO0MUTIIFEJ8yiW1InMu4hu/oRqamlY4mMoZql0viEmH6Dafh/p+zOl8OYvMJ3Vm3rFshgg==}
-    dependencies:
-      '@types/geojson': 7946.0.16
-      tslib: 2.8.1
-    dev: false
-
-  /@turf/jsts@2.7.2:
-    resolution: {integrity: sha512-zAezGlwWHPyU0zxwcX2wQY3RkRpwuoBmhhNE9HY9kWhFDkCxZ3aWK5URKwa/SWKJbj9aztO+8vtdiBA28KVJFg==}
-    dependencies:
-      jsts: 2.7.1
-    dev: false
-
-  /@turf/meta@7.3.1:
-    resolution: {integrity: sha512-NWsfOE5RVtWpLQNkfOF/RrYvLRPwwruxhZUV0UFIzHqfiRJ50aO9Y6uLY4bwCUe2TumLJQSR4yaoA72Rmr2mnQ==}
-    dependencies:
-      '@turf/helpers': 7.3.1
-      '@types/geojson': 7946.0.16
-    dev: false
-
-  /@turf/projection@7.3.1:
-    resolution: {integrity: sha512-nDM3LG2j37B1tCpF4xL4rUBrQJcG585IRyDIxL2QEvP1LLv6dcm4fodw70HcGAj05Ux8bJr7IOXQXnobOJrlRA==}
-    dependencies:
-      '@turf/clone': 7.3.1
-      '@turf/helpers': 7.3.1
-      '@turf/meta': 7.3.1
-      '@types/geojson': 7946.0.16
-      tslib: 2.8.1
-    dev: false
-
   /@tybys/wasm-util@0.10.1:
     resolution: {integrity: sha512-9tTaPJLSiejZKx+Bmog4uSubteqTvFrVrURwkmHixBo0G4seD0zUxp98E1DzUBJxLQ3NPwXrGKDiVjwx/DpPsg==}
     requiresBuild: true
@@ -4299,23 +4224,6 @@ packages:
     resolution: {integrity: sha512-Sg0xJUNDU1sJNGdfGWhVHX0kkZ+HWcvmVymJbj6NSgZZmW/8S9Y2HQ5euytnIgakgxN6papOAWiwDo1ctFDcoQ==}
     hasBin: true
 
-  /bbox-helper-functions@4.0.1:
-    resolution: {integrity: sha512-l4mr3W0q4ZYUJpNefLA0DspMW+7G1Mk+nM+DqUJ/a6YxBhsYyM/pwz88OyYnAOwAlGB6VkwUWDD3PSrHx3Ocaw==}
-    dependencies:
-      '@sindresorhus/is': 7.2.0
-      '@turf/bbox': 7.3.1
-      dlv: 1.1.3
-      ngeohash: 0.6.3
-      string-object-formatter: 4.0.1
-      wkt-parser-helper: 5.2.0
-    dev: false
-
-  /betterknown@1.2.0:
-    resolution: {integrity: sha512-9kuLOeVkgAXnKsMn9WAHLLJ45Wn51jPuZlS1XPkia7NoBpqM9EbVvr+A2Wr0g1WAEL5rX7/oM428Akd3wCL3vA==}
-    dependencies:
-      '@types/geojson': 7946.0.16
-    dev: false
-
   /bidi-js@1.1.0:
     resolution: {integrity: sha512-fX1Onk0tdVPC7obPWB5EbJ1z7NVhLq4m2xZLq2YXBkxzMXIGRpNMU88n0EPgWseKl12J7zXs7qrDxPK4sRs2fg==}
     dependencies:
@@ -4800,16 +4708,6 @@ packages:
   /csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
-  /d3-array@1.2.4:
-    resolution: {integrity: sha512-KHW6M86R+FUPYGb3R5XiYjXPq7VzwxZ22buHhAEVG5ztoEcZZMLov530mmccaqA1GghZArjQV46fuc8kUqhhHw==}
-    dev: false
-
-  /d3-geo@1.7.1:
-    resolution: {integrity: sha512-O4AempWAr+P5qbk2bC2FuN/sDW4z+dN2wDf9QV3bxQt4M5HfOEeXLgJ/UKQW0+o1Dj8BE+L5kiDbdWUMjsmQpw==}
-    dependencies:
-      d3-array: 1.2.4
-    dev: false
-
   /data-view-buffer@1.0.2:
     resolution: {integrity: sha512-EmKO5V3OLXh1rtK2wgXRansaK1/mtVdTUEiEI0W8RkvgT05kfxaH29PliLnpLP73yYO6142Q72QNa8Wx/A5CqQ==}
     engines: {node: '>= 0.4'}
@@ -4985,10 +4883,6 @@ packages:
     dependencies:
       path-type: 4.0.0
     dev: true
-
-  /dlv@1.1.3:
-    resolution: {integrity: sha512-+HlytyjlPKnIG8XuRG8WvmBP8xs8P71y+SKKS6ZXWoEgLuePxtDoUEiH7WkdePWrQ5JBpE6aoVqfZfJUQkjXwA==}
-    dev: false
 
   /doctrine@3.0.0:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
@@ -6531,11 +6425,6 @@ packages:
       promise: 7.3.1
     dev: true
 
-  /jsts@2.7.1:
-    resolution: {integrity: sha512-x2wSZHEBK20CY+Wy+BPE7MrFQHW6sIsdaGUMEqmGAio+3gFzQaBYPwLRonUfQf9Ak8pBieqj9tUofX1+WtAEIg==}
-    engines: {node: '>= 12'}
-    dev: false
-
   /kdbush@4.1.0:
     resolution: {integrity: sha512-e9vurzrXJQrFX6ckpHP3bvj5l+9CnYzkxDNnNQ1h2QTqdWsUAJgXiKdGNcOa1EY85dU8KbQ+z/FdQdB7P+9yfQ==}
     dev: false
@@ -7012,11 +6901,6 @@ packages:
 
   /natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
-
-  /ngeohash@0.6.3:
-    resolution: {integrity: sha512-kltF0cOxgx1AbmVzKxYZaoB0aj7mOxZeHaerEtQV0YaqnkXNq26WWqMmJ6lTqShYxVRWZ/mwvvTrNeOwdslWiw==}
-    engines: {node: '>=v0.2.0'}
-    dev: false
 
   /nitropack@2.12.9:
     resolution: {integrity: sha512-t6qqNBn2UDGMWogQuORjbL2UPevB8PvIPsPHmqvWpeGOlPr4P8Oc5oA8t3wFwGmaolM2M/s2SwT23nx9yARmOg==}
@@ -8700,10 +8584,6 @@ packages:
       fast-fifo: 1.3.2
       queue-tick: 1.0.1
 
-  /string-object-formatter@4.0.1:
-    resolution: {integrity: sha512-+o7mfBoajDPjk/KWxvdG+BCHo3Aa8hmrHv0o5KcDfyW5FN8Wjqi4cJZpTCtX3M8eTyykIbTeA58szna7wqhAtA==}
-    dev: false
-
   /string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
     engines: {node: '>=8'}
@@ -9785,13 +9665,6 @@ packages:
       assert-never: 1.3.0
       babel-walk: 3.0.0-canary-5
     dev: true
-
-  /wkt-parser-helper@5.2.0:
-    resolution: {integrity: sha512-xkog/4+TLbnjfqMC++I5/COiE6BsRjecaxSqfU7iwUiPewmz9tHlZQ10NlZsalRPk6bK70G8D53gjS2dBxkijQ==}
-    dependencies:
-      betterknown: 1.2.0
-      klona: 2.0.6
-    dev: false
 
   /workbox-background-sync@7.4.0:
     resolution: {integrity: sha512-8CB9OxKAgKZKyNMwfGZ1XESx89GryWTfI+V5yEj8sHjFH8MFelUwYXEyldEK6M6oKMmn807GoJFUEA1sC4XS9w==}
