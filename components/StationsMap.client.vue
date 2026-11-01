@@ -10,18 +10,16 @@
     @map:moveend="debouncedLoad"
   )
     mgl-navigation-control(position="top-left")
-    //- Declared before the stations so the satellite layer sits under the dots.
+    //- Declared before the stations so the weather layer sits under the dots.
     mgl-raster-source(
-      source-id="clouds",
-      :tiles="CLOUDS_TILES",
+      v-if="activeLayer",
+      :key="activeLayer.value",
+      source-id="weather",
+      :tiles="activeLayer.tiles",
       :tile-size="256",
-      attribution="Clouds © EUMETSAT"
+      :attribution="activeLayer.attribution"
     )
-      mgl-raster-layer(
-        layer-id="clouds",
-        :layout="cloudsLayout",
-        :paint="{ 'raster-opacity': 0.6 }"
-      )
+      mgl-raster-layer(layer-id="weather", :paint="{ 'raster-opacity': 0.6 }")
     mgl-geo-json-source(source-id="stations", :data="geoJson")
       mgl-circle-layer(
         layer-id="stations-circles",
@@ -67,7 +65,7 @@
       @click="toggleCondition(c.value)"
     )
   .absolute.bottom-0.right-0.m-2.rounded.bg-default.px-3.py-1.text-sm(class="mb-14 sm:mb-8")
-    u-switch(v-model="showClouds", label="Clouds (IR)", size="sm")
+    u-select(v-model="weatherLayer", :items="WEATHER_LAYERS", size="sm", class="w-44")
   .absolute.right-0.top-0.m-2
     u-badge(v-if="zoomedOut", color="neutral", variant="subtle", label="Zoom in to see stations")
     u-badge(v-else-if="loading", color="neutral", variant="subtle", icon="i-lucide-loader-circle", :ui="{ leadingIcon: 'animate-spin' }", label="Loading stations")
@@ -96,9 +94,18 @@ import type {
   MapLayerMouseEvent,
 } from "maplibre-gl";
 
-// EUMETSAT multi-satellite IR 10.8 µm mosaic: global between ~70ºN/S, updated every 3 h, no API key.
-const CLOUDS_TILES = [
-  "https://view.eumetsat.int/geoserver/ows?service=WMS&version=1.3.0&request=GetMap&layers=mumi:worldcloudmap_ir108&styles=&format=image/png&transparent=true&crs=EPSG:3857&width=256&height=256&bbox={bbox-epsg-3857}",
+const geometTiles = (layer: string, style = "") =>
+  `https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&layers=${layer}&styles=${style}&format=image/png&transparent=true&crs=EPSG:3857&width=256&height=256&bbox={bbox-epsg-3857}`;
+const GEOMET_ATTRIBUTION = "Weather © Environment and Climate Change Canada";
+
+const WEATHER_LAYERS = [
+  { label: "No weather layer", value: "none", tiles: [], attribution: "" },
+  { label: "Clouds (cover)", value: "clouds", tiles: [geometTiles("GDPS_15km_TotalCloudCover", "CLOUD")], attribution: GEOMET_ATTRIBUTION },
+  { label: "Radar (N. America)", value: "radar", tiles: [geometTiles("RADAR_1KM_RRAI")], attribution: GEOMET_ATTRIBUTION },
+  { label: "Precipitation rate", value: "precip", tiles: [geometTiles("GDPS_15km_PrecipRate")], attribution: GEOMET_ATTRIBUTION },
+  { label: "Temperature (2 m)", value: "temp", tiles: [geometTiles("GDPS-GEML_25km_AirTemp_2m")], attribution: GEOMET_ATTRIBUTION },
+  { label: "Wind (10 m)", value: "wind", tiles: [geometTiles("GDPS-GEML_25km_Winds_10m")], attribution: GEOMET_ATTRIBUTION },
+  { label: "Pressure (MSL)", value: "pressure", tiles: [geometTiles("GDPS-GEML_25km_Pressure_MSL")], attribution: GEOMET_ATTRIBUTION },
 ];
 const FETCH_DEBOUNCE_MS = 300;
 const MIN_ZOOM_TO_FETCH = 3;
@@ -137,7 +144,10 @@ const CONDITIONS = [
 const CATEGORIES = ["VFR", "MVFR", "IFR", "LIFR"];
 const CATEGORY_ITEMS = CATEGORIES.map(c => ({ label: c, value: c }));
 
-const showClouds = useLocalStorage("metarr:map-clouds", false);
+const weatherLayer = useLocalStorage("metarr:map-weather-layer", "none");
+const activeLayer = computed(() =>
+  WEATHER_LAYERS.find(l => l.value === weatherLayer.value && l.value !== "none"),
+);
 
 const categories = ref([...CATEGORIES]);
 const conditions = ref<string[]>([]);
@@ -174,10 +184,6 @@ const geoJson = computed(() => ({
     geometry: { type: "Point" as const, coordinates: [s.longitude, s.latitude] },
     properties: { icao: s.icao, flight_category: s.flight_category },
   })),
-}));
-
-const cloudsLayout = computed(() => ({
-  visibility: showClouds.value ? ("visible" as const) : ("none" as const),
 }));
 
 async function loadStations() {
